@@ -3,81 +3,96 @@
 {% block title %}Pending Approvals - CareSync{% endblock %}
 
 {% block content %}
-<div class="row g-3">
-    <!-- Header Segment -->
-    <div class="col-12 mb-1">
-        <div class="mb-3">
-            <a href="{{ url_for('staff.dashboard') }}" class="text-dark small text-decoration-none fw-bold">
-                <i class="fa-solid fa-arrow-left me-1"></i> Back to Dashboard
-            </a>
-        </div>
-        <div class="d-flex align-items-center justify-content-between border-bottom pb-3">
-            <div>
-                <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.8rem; letter-spacing: 0.1em;">Clinician Portal</span>
-                <h2 class="h3 fw-extrabold text-dark mb-0">Pending Request Queue</h2>
+<div class="container py-2">
+    <div class="row g-4">
+        <!-- Header Segment -->
+        <div class="col-12">
+            <div class="mb-3">
+                <a href="{{ url_for('staff.dashboard') }}" class="btn btn-link link-secondary text-decoration-none fw-semibold p-0 small shadow-none">
+                    <i class="fa-solid fa-arrow-left me-1 small"></i> Back to Dashboard
+                </a>
             </div>
-            <span class="badge bg-warning text-dark rounded-1 px-3 py-2 fw-bold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">Needs Action</span>
+            <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between border-bottom pb-4 mb-2 gap-3">
+                <div>
+                    <span class="text-uppercase text-primary fw-bold d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.12em;">Clinician Portal</span>
+                    <h2 class="h3 fw-bold text-dark mb-0">Pending Request Queue</h2>
+                </div>
+                <div>
+                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-2 fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                        <i class="fa-solid fa-bell me-1"></i> Needs Action
+                    </span>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <!-- MAIN PENDING LIST -->
-    <div class="col-12 mt-3">
-        {% if not appointments %}
-            <div class="text-center py-5 px-3 border border-secondary-subtle rounded-1 bg-white shadow-sm">
-                <i class="fa-solid fa-circle-check text-muted mb-2 fs-3"></i>
-                <p class="text-muted small mb-0">All booking requests processed! No pending schedules remaining.</p>
-            </div>
-        {% else %}
-            <div class="row g-3">
-                {% for appt in appointments %}
-                    <div class="col-12 col-md-6">
-                        <div class="card border border-secondary-subtle rounded-1 p-3 p-sm-4 bg-white shadow-sm h-100 d-flex flex-column justify-content-between">
-                            <div>
-                                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-2.5">
-                                    <div class="border-start border-4 border-warning ps-3">
-                                        <span class="text-uppercase text-danger fw-extrabold d-block mb-1" style="font-size: .8rem; letter-spacing: 0.08em;">
-                                            <i class="fa-regular fa-clock me-1"></i> Requested: {{ appt.appointment_date }} at {{ appt.appointment_time }}
-                                        </span>
-                                        <strong class="text-dark d-block fs-5 fw-extrabold mb-1">
-                                            Patient: {{ appt.pat_first }} {{ appt.pat_last }}
-                                        </strong>
-                                        <span class="text-secondary d-block fw-bold" style="font-size: 0.85rem;">Contact: {{ appt.phone_number or 'Not provided' }}</span>
+        <!-- MAIN PENDING LIST -->
+        <div class="col-12">
+            {% if not appointments %}
+                <div class="text-center py-5 px-3 bg-white border border-dashed rounded-3 shadow-sm">
+                    <div class="text-success mb-3">
+                        <i class="fa-solid fa-circle-check display-4 opacity-75"></i>
+                    </div>
+                    <h5 class="text-dark fw-bold mb-1">All Caught Up!</h5>
+                    <p class="text-secondary fw-medium small mb-0">All booking requests processed. No pending schedules remaining.</p>
+                </div>
+            {% else %}
+                <div class="row g-3">
+                    {% for appt in appointments %}
+                        <div class="col-12 col-xl-6">
+                            <div class="card border-0 shadow-sm rounded-3 h-100 d-flex flex-column justify-content-between overflow-hidden">
+                                <div class="card-body p-4">
+                                    <!-- Patient / Appointment Details Header -->
+                                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-3 mb-3">
+                                        <div>
+                                            <span class="text-uppercase text-danger fw-bold d-inline-flex align-items-center gap-1 mb-2 bg-danger-subtle px-2 py-1 rounded small" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                                                <i class="fa-regular fa-clock"></i> Requested: {{ appt.appointment_date }} @ {{ appt.appointment_time }}
+                                            </span>
+                                            <h4 class="h5 fw-bold text-dark mb-1">
+                                                {{ appt.pat_first }} {{ appt.pat_last }}
+                                            </h4>
+                                            <span class="text-muted d-block small fw-medium">
+                                                <i class="fa-solid fa-phone me-1 opacity-70"></i> {{ appt.phone_number or 'Contact not provided' }}
+                                            </span>
+                                        </div>
+                                        
+                                        <!-- Status Pill Indicator -->
+                                        <div>
+                                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3 py-2 fw-bold text-uppercase tracking-wider" style="font-size: 0.7rem;">
+                                                <i class="fa-solid fa-hourglass-half me-1 small opacity-75"></i> {{ appt.status }}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div class="flex-shrink-0 mt-2 mt-sm-0">
-                                        <span class="badge border border-2 border-warning text-warning bg-white text-uppercase rounded-1 px-3 py-1.5 fw-bold" style="font-size: 0.75rem; letter-spacing: 0.05em;">
-                                            {{ appt.status }}
-                                        </span>
-                                    </div>
+
+                                    <!-- Brief Symptom/Reason Box -->
+                                    {% if appt.symptoms_brief %}
+                                        <div class="bg-light p-3 rounded-2 border border-light-subtle mb-1">
+                                            <span class="text-uppercase text-muted d-block fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Reason for Visit</span>
+                                            <p class="text-dark small mb-0 lh-base">{{ appt.symptoms_brief }}</p>
+                                        </div>
+                                    {% endif %}
                                 </div>
 
-                                {% if appt.symptoms_brief %}
-                                    <div class="mt-3 text-dark bg-light p-3 rounded-1 border border-secondary-subtle" style="font-size: 0.85rem; line-height: 1.45;">
-                                        <strong class="text-dark">Reason for Visit:</strong> {{ appt.symptoms_brief }}
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Clinician Action Bar Footer -->
-                            <div class="mt-3.5 pt-3 border-top border-light-subtle">
-                                <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-between gap-3">
-                                    <div class="text-dark py-1" style="font-size: 0.9rem;">
-                                        Consultation Fee: <strong class="fw-extrabold">₱{{ "%.2f"|format(appt.amount_due) }}</strong>
+                                <!-- Actionable Footer Deck -->
+                                <div class="card-footer bg-light border-0 px-4 py-3 d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-between gap-3 mt-auto">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-muted small">Est. Fee:</span>
+                                        <strong class="text-dark fs-5 fw-bold">₱{{ "%.2f"|format(appt.amount_due) }}</strong>
                                     </div>
                                     
-                                    <div class="d-flex flex-column flex-sm-row gap-2 w-100 w-sm-auto">
-                                        <!-- Confirm booking request action -->
-                                        <form action="{{ url_for('staff.confirm', appointment_id=appt.id) }}" method="POST" class="m-0 mb-2 mb-sm-0 w-100 w-sm-auto d-grid d-sm-inline-block">
-                                            <!-- Submits to the route and redirects to keep clinician flow smooth -->
+                                    <!-- Action Submission Forms Stack -->
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <!-- Confirm Action Box -->
+                                        <form action="{{ url_for('staff.confirm', appointment_id=appt.id) }}" method="POST" class="m-0">
                                             <input type="hidden" name="redirect_to" value="pending">
-                                            <button type="submit" class="btn btn-dark btn-sm rounded-1 text-uppercase fw-bold py-2.5 px-4" style="font-size: 0.8rem; letter-spacing: 0.05em; min-height: 44px;">
-                                                Confirm Booking
+                                            <button type="submit" class="btn btn-primary btn-sm rounded-2 fw-semibold px-3 py-2" style="font-size: 0.8rem;">
+                                                <i class="fa-solid fa-calendar-check me-1"></i> Confirm Booking
                                             </button>
                                         </form>
 
-                                        <!-- Decline request action -->
-                                        <form action="{{ url_for('staff.cancel', appointment_id=appt.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to decline this request?');" class="m-0 w-100 w-sm-auto d-grid d-sm-inline-block">
+                                        <!-- Decline Action Box -->
+                                        <form action="{{ url_for('staff.cancel', appointment_id=appt.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to decline this request?');" class="m-0">
                                             <input type="hidden" name="redirect_to" value="pending">
-                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-1 text-uppercase fw-bold py-2.5 px-4" style="font-size: 0.8rem; letter-spacing: 0.05em; min-height: 44px;">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-2 fw-semibold px-3 py-2" style="font-size: 0.8rem;">
                                                 Decline
                                             </button>
                                         </form>
@@ -85,10 +100,17 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>
+
+<!-- Extra CSS layout helpers ensuring design aesthetics across screen targets -->
+<style>
+    .border-dashed { border-style: dashed !important; }
+    .btn-link { transition: color 0.15s ease-in-out; }
+    .btn-link:hover { color: var(--bs-primary) !important; }
+</style>
 {% endblock %}
