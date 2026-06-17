@@ -5,41 +5,43 @@
 {% block content %}
 <div class="row g-3">
     <!-- Welcome Header Segment -->
-    <div class="col-12 mb-2">
-        <div class="d-flex align-items-center justify-content-between border-bottom pb-3">
+    <div class="col-12 mb-1">
+        <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between border-bottom pb-3 gap-2">
             <div>
-                <span class="text-uppercase text-muted fw-bold small d-block" style="font-size: 0.65rem; letter-spacing: 0.1em;">Clinician Portal</span>
+                <span class="text-uppercase text-muted fw-bold d-block mb-1" style="font-size: 0.65rem; letter-spacing: 0.1em;">Clinician Portal</span>
                 <h2 class="h4 fw-bold text-dark mb-0">Welcome, Dr. {{ session.get('first_name', 'Doctor') }}</h2>
             </div>
-            <span class="badge border border-dark text-dark rounded-1 px-2 py-1.5 small fw-bold text-uppercase" style="font-size: 0.65rem;">Medical Staff</span>
+            <div>
+                <span class="badge border border-dark text-dark rounded-1 px-3 py-2 small fw-bold text-uppercase" style="font-size: 0.65rem;">Medical Staff</span>
+            </div>
         </div>
     </div>
 
-    <!-- METRICS OVERVIEW STRIP -->
+    <!-- METRICS OVERVIEW STRIP (Optimized grid for narrow displays) -->
     <div class="col-12">
         <div class="row g-2 text-center">
-            <div class="col-6 col-md-3">
-                <div class="border rounded-1 p-2 bg-white shadow-sm">
-                    <span class="text-muted d-block small" style="font-size: 0.7rem;">Total Queue</span>
-                    <strong class="text-dark fs-5">{{ stats.total }}</strong>
+            <div class="col-6 col-sm-3">
+                <div class="border rounded-1 p-2 bg-white shadow-sm h-100 d-flex flex-column justify-content-center">
+                    <span class="text-muted d-block small mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Total Queue</span>
+                    <strong class="text-dark fs-5 lh-1">{{ stats.total }}</strong>
                 </div>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="border rounded-1 p-2 bg-white shadow-sm">
-                    <span class="text-muted d-block small" style="font-size: 0.7rem;">Pending Approvals</span>
-                    <strong class="text-warning fs-5">{{ stats.Pending }}</strong>
+            <div class="col-6 col-sm-3">
+                <div class="border rounded-1 p-2 bg-white shadow-sm h-100 d-flex flex-column justify-content-center">
+                    <span class="text-muted d-block small mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Pending</span>
+                    <strong class="text-warning fs-5 lh-1">{{ stats.Pending }}</strong>
                 </div>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="border rounded-1 p-2 bg-white shadow-sm">
-                    <span class="text-muted d-block small" style="font-size: 0.7rem;">Confirmed Scheduled</span>
-                    <strong class="text-primary fs-5">{{ stats.Confirmed }}</strong>
+            <div class="col-6 col-sm-3">
+                <div class="border rounded-1 p-2 bg-white shadow-sm h-100 d-flex flex-column justify-content-center">
+                    <span class="text-muted d-block small mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Confirmed</span>
+                    <strong class="text-primary fs-5 lh-1">{{ stats.Confirmed }}</strong>
                 </div>
             </div>
-            <div class="col-6 col-md-3">
-                <div class="border rounded-1 p-2 bg-white shadow-sm">
-                    <span class="text-muted d-block small" style="font-size: 0.7rem;">Completed Visits</span>
-                    <strong class="text-success fs-5">{{ stats.Completed }}</strong>
+            <div class="col-6 col-sm-3">
+                <div class="border rounded-1 p-2 bg-white shadow-sm h-100 d-flex flex-column justify-content-center">
+                    <span class="text-muted d-block small mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Completed</span>
+                    <strong class="text-success fs-5 lh-1">{{ stats.Completed }}</strong>
                 </div>
             </div>
         </div>
@@ -48,8 +50,8 @@
     <!-- MAIN ACTIVE QUEUE COLUMN -->
     <div class="col-12">
         <div class="card border border-secondary-subtle rounded-1 shadow-sm bg-white">
-            <div class="card-header bg-transparent border-bottom border-light-subtle py-3 d-flex align-items-center justify-content-between">
-                <span class="text-uppercase text-dark fw-bold mb-0" style="letter-spacing: 0.08em;">Patient Schedules & Check-in Queue</span>
+            <div class="card-header bg-transparent border-bottom border-light-subtle py-3 px-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                <span class="text-uppercase text-dark fw-bold mb-0 small" style="letter-spacing: 0.08em;">Schedules & Queue</span>
                 <span class="badge bg-dark rounded-pill px-2.5 py-1" style="font-size: 0.65rem;">Active Records</span>
             </div>
             <div class="card-body p-0">
@@ -61,19 +63,20 @@
                 {% else %}
                     {% for appt in appointments %}
                         <div class="p-3 border-bottom border-light-subtle">
-                            <div class="d-flex justify-content-between align-items-start gap-2">
+                            <!-- Adaptive Top Header Block (Stacks vertically on small screens) -->
+                            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-2">
                                 <!-- Patient Info Details with Left Indicator Border -->
                                 <div class="border-start border-2 border-dark ps-2">
-                                    <span class="text-uppercase text-muted fw-bold d-block" style="font-size: .8rem; letter-spacing: 0.05em;">
+                                    <span class="text-uppercase text-muted fw-bold d-block mb-0.5" style="font-size: .75rem; letter-spacing: 0.05em;">
                                         {{ appt.appointment_date }} at {{ appt.appointment_time }}
                                     </span>
-                                    <strong class="text-dark d-block" style="font-size: 0.95rem;">
+                                    <strong class="text-dark d-block fs-6">
                                         Patient: {{ appt.pat_first }} {{ appt.pat_last }}
                                     </strong>
                                     <span class="text-muted d-block small" style="font-size: 0.75rem;">Contact: {{ appt.phone_number or 'Not provided' }}</span>
                                 </div>
                                 <!-- Status Badge Block -->
-                                <div class="text-end flex-shrink-0">
+                                <div class="flex-shrink-0 mt-1 mt-sm-0">
                                     <span class="badge border 
                                         {% if appt.status == 'Confirmed' %}border-primary text-primary
                                         {% elif appt.status == 'Pending' %}border-warning text-warning
@@ -87,34 +90,35 @@
 
                             <!-- Optional Patient Symptoms Summary -->
                             {% if appt.symptoms_brief %}
-                                <div class="mt-2 text-muted small bg-light p-2 rounded-1" style="font-size: 0.7rem; line-height: 1.35;">
+                                <div class="mt-2 text-muted small bg-light p-2.5 rounded-1" style="font-size: 0.75rem; line-height: 1.4;">
                                     <strong class="text-dark">Reason for Visit:</strong> {{ appt.symptoms_brief }}
                                 </div>
                             {% endif %}
 
                             <!-- Completed Medical Notes Display (if already completed) -->
                             {% if appt.status == 'Completed' and appt.medical_notes %}
-                                <div class="mt-2 p-2 rounded-1 border border-light-subtle small text-dark bg-white" style="font-size: 0.75rem;">
+                                <div class="mt-2 p-2.5 rounded-1 border border-light-subtle small text-dark bg-white" style="font-size: 0.75rem; line-height: 1.4;">
                                     <strong>Consultation Notes:</strong><br>
                                     <span class="text-secondary">{{ appt.medical_notes }}</span>
                                 </div>
                             {% endif %}
 
-                            <!-- Clinician Action Bar -->
+                            <!-- Clinician Action Bar (Optimized Stack for Mobile viewports) -->
                             {% if appt.status in ('Pending', 'Confirmed') %}
-                                <div class="d-flex align-items-center justify-content-between mt-2 pt-2 border-top border-light-subtle">
-                                    <span class="small text-muted" style="font-size: 0.75rem;">
+                                <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-between mt-3 pt-2 border-top border-light-subtle gap-2">
+                                    <div class="small text-muted py-1">
                                         Consultation Fee: <strong>₱{{ "%.2f"|format(appt.amount_due) }}</strong>
                                         <span class="badge {% if appt.payment_status == 'Paid' %}bg-success-subtle text-success{% else %}bg-warning-subtle text-warning{% endif %} ms-1" style="font-size: 0.6rem;">
                                             {{ appt.payment_status }}
                                         </span>
-                                    </span>
+                                    </div>
                                     
-                                    <div class="d-flex gap-1.5">
+                                    <!-- Mobile-Friendly stacked buttons -->
+                                    <div class="d-flex flex-column flex-sm-row gap-1.5 mt-1 mt-sm-0">
                                         <!-- If appointment is still pending approval -->
                                         {% if appt.status == 'Pending' %}
-                                            <form action="{{ url_for('staff.confirm', appointment_id=appt.id) }}" method="POST" class="m-0">
-                                                <button type="submit" class="btn btn-dark btn-sm rounded-1 text-uppercase fw-bold" style="font-size: 0.65rem; padding: 0.25rem 0.6rem;">
+                                            <form action="{{ url_for('staff.confirm', appointment_id=appt.id) }}" method="POST" class="m-0 d-grid d-sm-inline-block">
+                                                <button type="submit" class="btn btn-dark btn-sm rounded-1 text-uppercase fw-bold py-2 px-3 py-sm-1" style="font-size: 0.7rem;">
                                                     Confirm Booking
                                                 </button>
                                             </form>
@@ -123,8 +127,8 @@
                                         <!-- If appointment is confirmed and ready to be completed -->
                                         {% if appt.status == 'Confirmed' %}
                                             <button type="button" 
-                                                    class="btn btn-outline-black btn-sm rounded-1 text-uppercase fw-bold btn-complete-trigger" 
-                                                    style="font-size: 0.65rem; padding: 0.25rem 0.6rem;"
+                                                    class="btn btn-outline-black btn-sm rounded-1 text-uppercase fw-bold btn-complete-trigger py-2 px-3 py-sm-1" 
+                                                    style="font-size: 0.7rem;"
                                                     data-action-url="{{ url_for('staff.complete', appointment_id=appt.id) }}"
                                                     data-patient-name="{{ appt.pat_first }} {{ appt.pat_last }}">
                                                 Checkout & Complete
@@ -132,8 +136,8 @@
                                         {% endif %}
 
                                         <!-- Cancel action (Can cancel either pending or confirmed) -->
-                                        <form action="{{ url_for('staff.cancel', appointment_id=appt.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this appointment schedule?');" class="m-0">
-                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-1 text-uppercase fw-bold" style="font-size: 0.65rem; padding: 0.25rem 0.6rem;">
+                                        <form action="{{ url_for('staff.cancel', appointment_id=appt.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this appointment schedule?');" class="m-0 d-grid d-sm-inline-block">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-1 text-uppercase fw-bold py-2 px-3 py-sm-1" style="font-size: 0.7rem;">
                                                 Decline
                                             </button>
                                         </form>
@@ -150,7 +154,7 @@
 
 <!-- MINIMALIST BOOTSTRAP 5 MODAL FOR WRITING CLINIC BRIEFING NOTES ON COMPLETION -->
 <div class="modal fade" id="completeConsultationModal" tabindex="-1" aria-labelledby="completeConsultationLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered px-3">
         <div class="modal-content rounded-1 border border-secondary bg-white shadow-lg">
             <form id="modalCompleteForm" action="" method="POST" class="needs-validation m-0" novalidate>
                 <div class="modal-header border-0 pb-1">
@@ -168,11 +172,11 @@
                         <div class="invalid-feedback">Please enter clinical notes before finalizing.</div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 pt-0 d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-outline-black btn-sm rounded-1 px-3 py-1.5 text-uppercase fw-bold small" style="font-size: 0.75rem;" data-bs-dismiss="modal">
+                <div class="modal-footer border-0 pt-0 d-flex flex-column flex-sm-row justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-black btn-sm rounded-1 px-3 py-2 py-sm-1.5 text-uppercase fw-bold small w-100 w-sm-auto order-2 order-sm-1" style="font-size: 0.75rem;" data-bs-dismiss="modal">
                         Go Back
                     </button>
-                    <button type="submit" class="btn btn-dark btn-sm rounded-1 px-3 py-1.5 text-uppercase fw-bold small" style="font-size: 0.75rem;">
+                    <button type="submit" class="btn btn-dark btn-sm rounded-1 px-3 py-2 py-sm-1.5 text-uppercase fw-bold small w-100 w-sm-auto order-1 order-sm-2" style="font-size: 0.75rem;">
                         Finalize & Bill
                     </button>
                 </div>
