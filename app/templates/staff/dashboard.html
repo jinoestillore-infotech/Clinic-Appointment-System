@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block title %}Doctor Portal - CareSync{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+    <!-- Welcome Header Segment -->
+    <div class="col-12 mb-2">
+        <div class="d-flex align-items-center justify-content-between border-bottom pb-3">
+            <div>
+                <span class="text-uppercase text-muted fw-bold small d-block" style="font-size: 0.65rem; letter-spacing: 0.1em;">Clinician Portal</span>
+                <h2 class="h4 fw-bold text-dark mb-0">Welcome, Dr. {{ session.get('first_name', 'Doctor') }}</h2>
+            </div>
+            <span class="badge border border-dark text-dark rounded-1 px-2 py-1.5 small fw-bold text-uppercase" style="font-size: 0.65rem;">Medical Staff</span>
+        </div>
+    </div>
+
+    <!-- METRICS OVERVIEW STRIP -->
+    <div class="col-12">
+        <div class="row g-2 text-center">
+            <div class="col-6 col-md-3">
+                <div class="border rounded-1 p-2 bg-white shadow-sm">
+                    <span class="text-muted d-block small" style="font-size: 0.7rem;">Total Queue</span>
+                    <strong class="text-dark fs-5">{{ stats.total }}</strong>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="border rounded-1 p-2 bg-white shadow-sm">
+                    <span class="text-muted d-block small" style="font-size: 0.7rem;">Pending Approvals</span>
+                    <strong class="text-warning fs-5">{{ stats.Pending }}</strong>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="border rounded-1 p-2 bg-white shadow-sm">
+                    <span class="text-muted d-block small" style="font-size: 0.7rem;">Confirmed Scheduled</span>
+                    <strong class="text-primary fs-5">{{ stats.Confirmed }}</strong>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="border rounded-1 p-2 bg-white shadow-sm">
+                    <span class="text-muted d-block small" style="font-size: 0.7rem;">Completed Visits</span>
+                    <strong class="text-success fs-5">{{ stats.Completed }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN ACTIVE QUEUE COLUMN -->
+    <div class="col-12">
+        <div class="card border border-secondary-subtle rounded-1 shadow-sm bg-white">
+            <div class="card-header bg-transparent border-bottom border-light-subtle py-3 d-flex align-items-center justify-content-between">
+                <span class="text-uppercase text-dark fw-bold mb-0" style="letter-spacing: 0.08em;">Patient Schedules & Check-in Queue</span>
+                <span class="badge bg-dark rounded-pill px-2.5 py-1" style="font-size: 0.65rem;">Active Records</span>
+            </div>
+            <div class="card-body p-0">
+                {% if not appointments %}
+                    <div class="text-center py-5 px-3">
+                        <i class="fa-solid fa-users-viewfinder text-muted mb-2 fs-3"></i>
+                        <p class="text-muted small mb-0">No patient bookings found in your database profile.</p>
+                    </div>
+                {% else %}
+                    {% for appt in appointments %}
+                        <div class="p-3 border-bottom border-light-subtle">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <!-- Patient Info Details with Left Indicator Border -->
+                                <div class="border-start border-2 border-dark ps-2">
+                                    <span class="text-uppercase text-muted fw-bold d-block" style="font-size: .8rem; letter-spacing: 0.05em;">
+                                        {{ appt.appointment_date }} at {{ appt.appointment_time }}
+                                    </span>
+                                    <strong class="text-dark d-block" style="font-size: 0.95rem;">
+                                        Patient: {{ appt.pat_first }} {{ appt.pat_last }}
+                                    </strong>
+                                    <span class="text-muted d-block small" style="font-size: 0.75rem;">Contact: {{ appt.phone_number or 'Not provided' }}</span>
+                                </div>
+                                <!-- Status Badge Block -->
+                                <div class="text-end flex-shrink-0">
+                                    <span class="badge border 
+                                        {% if appt.status == 'Confirmed' %}border-primary text-primary
+                                        {% elif appt.status == 'Pending' %}border-warning text-warning
+                                        {% elif appt.status == 'Completed' %}border-success text-success
+                                        {% else %}border-danger text-danger{% endif %} 
+                                        bg-white text-uppercase rounded-1 px-2 py-1" style="font-size: 0.55rem; letter-spacing: 0.05em;">
+                                        {{ appt.status }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Optional Patient Symptoms Summary -->
+                            {% if appt.symptoms_brief %}
+                                <div class="mt-2 text-muted small bg-light p-2 rounded-1" style="font-size: 0.7rem; line-height: 1.35;">
+                                    <strong class="text-dark">Reason for Visit:</strong> {{ appt.symptoms_brief }}
+                                </div>
+                            {% endif %}
+
+                            <!-- Completed Medical Notes Display (if already completed) -->
+                            {% if appt.status == 'Completed' and appt.medical_notes %}
+                                <div class="mt-2 p-2 rounded-1 border border-light-subtle small text-dark bg-white" style="font-size: 0.75rem;">
+                                    <strong>Consultation Notes:</strong><br>
+                                    <span class="text-secondary">{{ appt.medical_notes }}</span>
+                                </div>
+                            {% endif %}
+
+                            <!-- Clinician Action Bar -->
+                            {% if appt.status in ('Pending', 'Confirmed') %}
+                                <div class="d-flex align-items-center justify-content-between mt-2 pt-2 border-top border-light-subtle">
+                                    <span class="small text-muted" style="font-size: 0.75rem;">
+                                        Consultation Fee: <strong>₱{{ "%.2f"|format(appt.amount_due) }}</strong>
+                                        <span class="badge {% if appt.payment_status == 'Paid' %}bg-success-subtle text-success{% else %}bg-warning-subtle text-warning{% endif %} ms-1" style="font-size: 0.6rem;">
+                                            {{ appt.payment_status }}
+                                        </span>
+                                    </span>
+                                    
+                                    <div class="d-flex gap-1.5">
+                                        <!-- If appointment is still pending approval -->
+                                        {% if appt.status == 'Pending' %}
+                                            <form action="{{ url_for('staff.confirm', appointment_id=appt.id) }}" method="POST" class="m-0">
+                                                <button type="submit" class="btn btn-dark btn-sm rounded-1 text-uppercase fw-bold" style="font-size: 0.65rem; padding: 0.25rem 0.6rem;">
+                                                    Confirm Booking
+                                                </button>
+                                            </form>
+                                        {% endif %}
+
+                                        <!-- If appointment is confirmed and ready to be completed -->
+                                        {% if appt.status == 'Confirmed' %}
+                                            <button type="button" 
+                                                    class="btn btn-outline-black btn-sm rounded-1 text-uppercase fw-bold btn-complete-trigger" 
+                                                    style="font-size: 0.65rem; padding: 0.25rem 0.6rem;"
+                                                    data-action-url="{{ url_for('staff.complete', appointment_id=appt.id) }}"
+                                                    data-patient-name="{{ appt.pat_first }} {{ appt.pat_last }}">
+                                                Checkout & Complete
+                                            </button>
+                                        {% endif %}
+
+                                        <!-- Cancel action (Can cancel either pending or confirmed) -->
+                                        <form action="{{ url_for('staff.cancel', appointment_id=appt.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this appointment schedule?');" class="m-0">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-1 text-uppercase fw-bold" style="font-size: 0.65rem; padding: 0.25rem 0.6rem;">
+                                                Decline
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MINIMALIST BOOTSTRAP 5 MODAL FOR WRITING CLINIC BRIEFING NOTES ON COMPLETION -->
+<div class="modal fade" id="completeConsultationModal" tabindex="-1" aria-labelledby="completeConsultationLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-1 border border-secondary bg-white shadow-lg">
+            <form id="modalCompleteForm" action="" method="POST" class="needs-validation m-0" novalidate>
+                <div class="modal-header border-0 pb-1">
+                    <h5 class="modal-title fw-bold text-dark text-uppercase fs-6 tracking-wider" id="completeConsultationLabel">
+                        Consultation Summary
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: grayscale(1);"></button>
+                </div>
+                <div class="modal-body py-3">
+                    <p class="text-muted mb-3 small">Please enter treatment remarks or prescription instructions below to finalize checkout for <strong id="modalPatientName">...</strong></p>
+                    
+                    <div class="mb-1">
+                        <label for="medical_notes" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Treatment Notes / Prescription *</label>
+                        <textarea class="form-control border-secondary-subtle bg-white rounded-1 small" id="medical_notes" name="medical_notes" rows="4" placeholder="Enter findings, prescriptions, or post-appointment guidance details..." required></textarea>
+                        <div class="invalid-feedback">Please enter clinical notes before finalizing.</div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-black btn-sm rounded-1 px-3 py-1.5 text-uppercase fw-bold small" style="font-size: 0.75rem;" data-bs-dismiss="modal">
+                        Go Back
+                    </button>
+                    <button type="submit" class="btn btn-dark btn-sm rounded-1 px-3 py-1.5 text-uppercase fw-bold small" style="font-size: 0.75rem;">
+                        Finalize & Bill
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Trigger Handler Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const completeTriggers = document.querySelectorAll('.btn-complete-trigger');
+        const modalForm = document.getElementById('modalCompleteForm');
+        const modalPatientText = document.getElementById('modalPatientName');
+        
+        // Initialize the Bootstrap Modal instance
+        const completionModal = new bootstrap.Modal(document.getElementById('completeConsultationModal'));
+
+        completeTriggers.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const targetActionUrl = this.getAttribute('data-action-url');
+                const patientName = this.getAttribute('data-patient-name');
+
+                // Dynamic binding to modal elements
+                modalForm.setAttribute('action', targetActionUrl);
+                modalPatientText.innerText = patientName;
+
+                completionModal.show();
+            });
+        });
+    });
+</script>
+{% endblock %}

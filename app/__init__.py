@@ -40,8 +40,10 @@ def create_app():
     # Register blueprints (Routes)
     from app.routes.auth import auth_bp
     from app.routes.patient import patient_bp
+    from app.routes.staff import staff_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(patient_bp)
-    
+    app.register_blueprint(staff_bp)
+
     return app
