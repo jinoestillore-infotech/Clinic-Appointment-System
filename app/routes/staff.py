@@ -20,7 +20,7 @@ def staff_required(f):
 @staff_required
 def dashboard():
     """
-    Renders the clinician dashboard containing daily stats and patient queue management.
+    Renders the clinician dashboard containing stats and active/past consultations.
     """
     connection = current_app.get_db_connection()
     appointments = []
@@ -28,15 +28,11 @@ def dashboard():
     
     try:
         cursor = connection.cursor(dictionary=True)
-        
-        # 1. Resolve which doctor ID belongs to this authenticated staff user
         cursor.execute("SELECT id, specialization FROM doctors WHERE user_id = %s", (session['user_id'],))
         doctor = cursor.fetchone()
         
         if doctor:
             doctor_id = doctor['id']
-            
-            # 2. Fetch all appointments booked with this doctor
             cursor.execute("""
                 SELECT a.id, a.appointment_date, a.appointment_time, a.status, a.symptoms_brief, a.medical_notes,
                        u.first_name AS pat_first, u.last_name AS pat_last, u.phone_number,
@@ -49,15 +45,13 @@ def dashboard():
             """, (doctor_id,))
             appointments = cursor.fetchall()
             
-            # 3. Compile real-time metrics for counters
             for appt in appointments:
                 stats['total'] += 1
                 status = appt['status']
                 if status in stats:
                     stats[status] += 1
         else:
-            flash('Could not find an associated Doctor Profile for your account. Please consult the Administrator.', 'warning')
-            
+            flash('Doctor profile not found.', 'warning')
         cursor.close()
     except Exception as e:
         flash(f'An error occurred: {str(e)}', 'danger')
@@ -65,6 +59,41 @@ def dashboard():
         connection.close()
         
     return render_template('staff/dashboard.html', appointments=appointments, stats=stats)
+
+
+@staff_bp.route('/pending')
+@staff_required
+def pending():
+    """
+    Renders the isolated pending appointments queue for clinical staff.
+    """
+    connection = current_app.get_db_connection()
+    appointments = []
+    try:
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT id FROM doctors WHERE user_id = %s", (session['user_id'],))
+        doctor = cursor.fetchone()
+        
+        if doctor:
+            doctor_id = doctor['id']
+            cursor.execute("""
+                SELECT a.id, a.appointment_date, a.appointment_time, a.status, a.symptoms_brief,
+                       u.first_name AS pat_first, u.last_name AS pat_last, u.phone_number,
+                       b.amount_due, b.payment_status
+                FROM appointments a
+                JOIN users u ON a.patient_id = u.id
+                LEFT JOIN billing b ON a.id = b.appointment_id
+                WHERE a.doctor_id = %s AND a.status = 'Pending'
+                ORDER BY a.appointment_date ASC, a.appointment_time ASC
+            """, (doctor_id,))
+            appointments = cursor.fetchall()
+        cursor.close()
+    except Exception as e:
+        flash(f'An error occurred: {str(e)}', 'danger')
+    finally:
+        connection.close()
+        
+    return render_template('staff/pending.html', appointments=appointments)
 
 
 @staff_bp.route('/confirm/<int:appointment_id>', methods=['POST'])
@@ -84,6 +113,9 @@ def confirm(appointment_id):
     finally:
         connection.close()
         
+    # Support smart redirection back to pending queue if submitted from there
+    if request.form.get('redirect_to') == 'pending':
+        return redirect(url_for('staff.pending'))
     return redirect(url_for('staff.dashboard'))
 
 
@@ -91,7 +123,7 @@ def confirm(appointment_id):
 @staff_required
 def cancel(appointment_id):
     """
-    Cancels an appointment from the doctor queue.
+    Cancels or declines an appointment.
     """
     connection = current_app.get_db_connection()
     try:
@@ -104,6 +136,8 @@ def cancel(appointment_id):
     finally:
         connection.close()
         
+    if request.form.get('redirect_to') == 'pending':
+        return redirect(url_for('staff.pending'))
     return redirect(url_for('staff.dashboard'))
 
 
@@ -111,33 +145,26 @@ def cancel(appointment_id):
 @staff_required
 def complete(appointment_id):
     """
-    Completes a consultation, records the doctor's briefing notes, 
-    and automatically marks the invoice as Paid (assuming standard cash/in-clinic payment).
+    Completes a consultation and updates records.
     """
     medical_notes = request.form.get('medical_notes')
-    
     connection = current_app.get_db_connection()
     try:
         cursor = connection.cursor(dictionary=True)
-        
-        # Update appointment state & append doctor's treatment details
         cursor.execute("""
             UPDATE appointments 
             SET status = 'Completed', medical_notes = %s 
             WHERE id = %s
         """, (medical_notes, appointment_id))
-        
-        # Update billing status to Paid upon successful checkout
         cursor.execute("""
             UPDATE billing 
             SET payment_status = 'Paid', payment_method = 'Cash', paid_at = CURRENT_TIMESTAMP 
             WHERE appointment_id = %s
         """, (appointment_id,))
-        
-        flash('Consultation completed and checkout billing invoice generated.', 'success')
+        flash('Consultation completed successfully.', 'success')
         cursor.close()
     except Exception as e:
-        flash(f'Failed to complete consultation checkout: {str(e)}', 'danger')
+        flash(f'Failed to complete consultation: {str(e)}', 'danger')
     finally:
         connection.close()
         
