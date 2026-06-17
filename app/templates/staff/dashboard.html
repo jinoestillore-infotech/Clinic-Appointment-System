@@ -6,6 +6,7 @@
 <div class="container py-2">
     <div class="row g-4">
         
+        <!-- Header Segment -->
         <div class="col-12">
             <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between border-bottom pb-4 mb-2 gap-3">
                 <div>
@@ -20,6 +21,7 @@
             </div>
         </div>
 
+        <!-- Metrics Overview Grid Row -->
         <div class="col-12">
             <div class="row g-3">
                 <div class="col-6 col-lg-3">
@@ -47,7 +49,7 @@
                                     <h3 class="text-warning fw-bold mb-0 display-6">{{ stats.Pending }}</h3>
                                 </div>
                                 <div class="bg-warning-subtle text-warning rounded-3 p-3 d-none d-sm-block">
-                                    <i class="fa-solid fa-clock-solid fa-hourglass-half fs-4"></i>
+                                    <i class="fa-solid fa-hourglass-half fs-4"></i>
                                 </div>
                                 {% if stats.Pending > 0 %}
                                     <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-2 border-white rounded-circle animate-pulse">
@@ -89,6 +91,7 @@
             </div>
         </div>
 
+        <!-- Dynamic Dismissable Call-To-Action Banner -->
         {% if stats.Pending > 0 %}
             <div class="col-12 mt-3">
                 <div class="card bg-warning-subtle border-0 rounded-3 shadow-sm">
@@ -110,112 +113,63 @@
             </div>
         {% endif %}
 
+        <!-- Interactive Launchpad Deck (Replacing Old List Module) -->
         <div class="col-12 mt-4">
-            <div class="d-flex align-items-center justify-content-between border-bottom pb-2">
-                <h3 class="h6 text-uppercase fw-bold text-secondary mb-0" style="letter-spacing: 0.08em;">Schedules & Queue</h3>
-                <span class="badge bg-dark-subtle text-dark rounded-pill px-3 py-1.5 fw-semibold small">Active Records</span>
+            <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
+                <h3 class="h6 text-uppercase fw-bold text-secondary mb-0" style="letter-spacing: 0.08em;">Schedules & Queue Management</h3>
+                <span class="badge bg-dark-subtle text-dark rounded-pill px-3 py-1.5 fw-semibold small">Portal Directory</span>
+            </div>
+            
+            <div class="row g-3">
+                <!-- Launchpad Box 1: Pending Action Queue Route -->
+                <div class="col-12 col-md-6">
+                    <a href="{{ url_for('staff.pending') }}" class="text-decoration-none text-dark d-block h-100 card-hover">
+                        <div class="card border-0 shadow-sm rounded-3 p-4 bg-white h-100 position-relative overflow-hidden group">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="bg-warning-subtle text-warning rounded-3 p-3">
+                                    <i class="fa-solid fa-hourglass-half fs-4"></i>
+                                </div>
+                                <span class="badge bg-warning text-dark rounded-pill px-2.5 py-1 small fw-bold text-uppercase" style="font-size: 0.65rem;">
+                                    {{ stats.Pending }} Awaiting
+                                </span>
+                            </div>
+                            <h4 class="h5 fw-bold text-dark mb-2">Pending Request Queue</h4>
+                            <p class="text-muted small mb-0 lh-base">Review, confirm, or decline newcomer appointment entries requesting scheduled consultation time allocations.</p>
+                            <div class="text-primary fw-semibold small mt-4 d-inline-flex align-items-center transition-arrow">
+                                Open Queue Portal <i class="fa-solid fa-arrow-right ms-1 small"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- Launchpad Box 2: Active Consultations/History Route -->
+                <div class="col-12 col-md-6">
+                    <!-- Note: Change this path pointer below if your active sessions reside on an alternative route -->
+                    <a href="#" class="text-decoration-none text-dark d-block h-100 card-hover">
+                        <div class="card border-0 shadow-sm rounded-3 p-4 bg-white h-100 position-relative overflow-hidden">
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="bg-primary-subtle text-primary rounded-3 p-3">
+                                    <i class="fa-solid fa-file-prescription fs-4"></i>
+                                </div>
+                                <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1 small fw-bold text-uppercase" style="font-size: 0.65rem;">
+                                    {{ stats.Confirmed + stats.Completed }} Records
+                                </span>
+                            </div>
+                            <h4 class="h5 fw-bold text-dark mb-2">Active Consultations & Records</h4>
+                            <p class="text-muted small mb-0 lh-base">Examine confirmed, running outpatient sequences, access completed history folders, and complete post-visit medical notes.</p>
+                            <div class="text-primary fw-semibold small mt-4 d-inline-flex align-items-center transition-arrow">
+                                Access Records Vault <i class="fa-solid fa-arrow-right ms-1 small"></i>
+                            </div>
+                        </div>
+                    </a>
+                </div>
             </div>
         </div>
 
-        <div class="col-12">
-            {% set active_count = namespace(value=0) %}
-            {% for appt in appointments %}
-                {% if appt.status != 'Pending' %}
-                    {% set active_count.value = active_count.value + 1 %}
-                {% endif %}
-            {% endfor %}
-
-            {% if active_count.value == 0 %}
-                <div class="text-center py-5 px-3 bg-white border border-dashed rounded-3 shadow-sm">
-                    <div class="text-muted mb-3">
-                        <i class="fa-solid fa-folder-open display-4 opacity-50"></i>
-                    </div>
-                    <p class="text-secondary fw-medium mb-0">No active or past clinic consultations found in your dashboard.</p>
-                </div>
-            {% else %}
-                <div class="row g-3">
-                    {% for appt in appointments %}
-                        {% if appt.status != 'Pending' %}
-                            <div class="col-12 col-xl-6">
-                                <div class="card border-0 shadow-sm rounded-3 h-100 d-flex flex-column justify-content-between overflow-hidden">
-                                    <div class="card-body p-4">
-                                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-3 mb-3">
-                                            <div>
-                                                <span class="text-uppercase text-danger fw-bold d-inline-flex align-items-center gap-1 mb-2 bg-danger-subtle px-2 py-1 rounded small" style="font-size: 0.75rem; letter-spacing: 0.05em;">
-                                                    <i class="fa-regular fa-clock"></i> {{ appt.appointment_date }} @ {{ appt.appointment_time }}
-                                                </span>
-                                                <h4 class="h5 fw-bold text-dark mb-1">
-                                                    {{ appt.pat_first }} {{ appt.pat_last }}
-                                                </h4>
-                                                <span class="text-muted d-block small fw-medium">
-                                                    <i class="fa-solid fa-phone me-1 opacity-70"></i> {{ appt.phone_number or 'Contact not provided' }}
-                                                </span>
-                                            </div>
-                                            
-                                            <div>
-                                                <span class="badge rounded-pill px-3 py-2 fw-bold text-uppercase border tracking-wider
-                                                    {% if appt.status == 'Confirmed' %}bg-primary-subtle text-primary border-primary-subtle
-                                                    {% elif appt.status == 'Completed' %}bg-success-subtle text-success border-success-subtle
-                                                    {% else %}bg-danger-subtle text-danger border-danger-subtle{% endif %}" style="font-size: 0.7rem;">
-                                                    <i class="fa-solid fa-circle me-1 small opacity-75"></i> {{ appt.status }}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {% if appt.symptoms_brief %}
-                                            <div class="bg-light p-3 rounded-2 border border-light-subtle mb-3">
-                                                <span class="text-uppercase text-muted d-block fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Reason for Visit</span>
-                                                <p class="text-dark small mb-0 lh-base">{{ appt.symptoms_brief }}</p>
-                                            </div>
-                                        {% endif %}
-
-                                        {% if appt.status == 'Completed' and appt.medical_notes %}
-                                            <div class="bg-white p-3 rounded-2 border border-secondary-subtle">
-                                                <span class="text-uppercase text-success d-block fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;"><i class="fa-solid fa-notes-medical me-1"></i> Consultation Notes</span>
-                                                <p class="text-secondary small mb-0 lh-base">{{ appt.medical_notes }}</p>
-                                            </div>
-                                        {% endif %}
-                                    </div>
-
-                                    {% if appt.status in ('Pending', 'Confirmed') %}
-                                        <div class="card-footer bg-light border-0 px-4 py-3 d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-between gap-3 mt-auto">
-                                            <div class="d-flex align-items-center gap-2">
-                                                <span class="text-muted small">Fee:</span>
-                                                <strong class="text-dark fs-5 fw-bold">₱{{ "%.2f"|format(appt.amount_due) }}</strong>
-                                                <span class="badge {% if appt.payment_status == 'Paid' %}bg-success{% else %}bg-warning text-dark{% endif %} ms-1 rounded-1" style="font-size: 0.65rem;">
-                                                    {{ appt.payment_status }}
-                                                </span>
-                                            </div>
-                                            
-                                            <div class="d-flex gap-2 justify-content-end">
-                                                {% if appt.status == 'Confirmed' %}
-                                                    <button type="button" 
-                                                            class="btn btn-primary btn-sm rounded-2 fw-semibold btn-complete-trigger px-3 py-2" 
-                                                            style="font-size: 0.8rem;"
-                                                            data-action-url="{{ url_for('staff.complete', appointment_id=appt.id) }}"
-                                                            data-patient-name="{{ appt.pat_first }} {{ appt.pat_last }}">
-                                                        <i class="fa-solid fa-check-to-slot me-1"></i> Complete Session
-                                                    </button>
-                                                {% endif %}
-
-                                                <form action="{{ url_for('staff.cancel', appointment_id=appt.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this appointment schedule?');" class="m-0">
-                                                    <button type="submit" class="btn btn-outline-danger btn-sm rounded-2 fw-semibold px-3 py-2" style="font-size: 0.8rem;">
-                                                        Decline
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </div>
     </div>
 </div>
 
+<!-- Modal Construction Layer (Retained for application architecture support) -->
 <div class="modal fade" id="completeConsultationModal" tabindex="-1" aria-labelledby="completeConsultationLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
@@ -228,7 +182,6 @@
                 </div>
                 <div class="modal-body p-4">
                     <p class="text-muted mb-3 small">Please enter treatment remarks or prescription instructions below to finalize checkout for <strong id="modalPatientName" class="text-dark">...</strong></p>
-                    
                     <div class="mb-1">
                         <label for="medical_notes" class="form-label text-dark fw-semibold small mb-1">Treatment Notes / Prescription *</label>
                         <textarea class="form-control border-secondary-subtle rounded-2 p-2.5 small" id="medical_notes" name="medical_notes" rows="4" placeholder="Enter findings, prescriptions, or post-appointment guidance details..." required></textarea>
@@ -236,12 +189,8 @@
                     </div>
                 </div>
                 <div class="modal-footer bg-light px-4 py-3 d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-light border rounded-2 fw-semibold px-3" data-bs-dismiss="modal">
-                        Cancel
-                    </button>
-                    <button type="submit" class="btn btn-success rounded-2 fw-semibold px-4">
-                        Finalize & Bill
-                    </button>
+                    <button type="button" class="btn btn-light border rounded-2 fw-semibold px-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success rounded-2 fw-semibold px-4">Finalize & Bill</button>
                 </div>
             </form>
         </div>
@@ -250,9 +199,10 @@
 
 <style>
     .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-    .card-hover:hover { transform: translateY(-2px); }
-    .border-dashed { border-style: dashed !important; }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 .5rem 1.5rem rgba(0,0,0,.08)!important; }
     .animate-pulse { animation: pulse 2s infinite; }
+    .transition-arrow i { transition: transform 0.2s ease; }
+    .card-hover:hover .transition-arrow i { transform: translateX(4px); }
     @keyframes pulse {
         0% { transform: translate(-50%, -50%) scale(0.9); opacity: 1; }
         50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.6; }
@@ -265,17 +215,14 @@
         const completeTriggers = document.querySelectorAll('.btn-complete-trigger');
         const modalForm = document.getElementById('modalCompleteForm');
         const modalPatientText = document.getElementById('modalPatientName');
-        
         const completionModal = new bootstrap.Modal(document.getElementById('completeConsultationModal'));
 
         completeTriggers.forEach(function (button) {
             button.addEventListener('click', function () {
                 const targetActionUrl = this.getAttribute('data-action-url');
                 const patientName = this.getAttribute('data-patient-name');
-
                 modalForm.setAttribute('action', targetActionUrl);
                 modalPatientText.innerText = patientName;
-
                 completionModal.show();
             });
         });

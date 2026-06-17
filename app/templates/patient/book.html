@@ -3,78 +3,88 @@
 {% block title %}Book Appointment - CareSync{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-12 col-sm-10 col-md-8 col-lg-5">
-        
-        <!-- Navigation Breadcrumb link -->
-        <div class="mb-3">
-            <a href="{{ url_for('patient.dashboard') }}" class="text-dark small text-decoration-none">
-                <i class="fa-solid fa-arrow-left me-1"></i> Back to Dashboard
-            </a>
-        </div>
-
-        <!-- Booking Form Card (Pure Minimalist Bootstrap 5) -->
-        <div class="card border border-secondary-subtle rounded-1 shadow-sm bg-white">
-            <div class="card-header border-0 bg-transparent pt-4 pb-2 px-4 text-center">
-                <h3 class="fw-bold text-dark fs-4 mb-1">Book Appointment</h3>
-                <p class="text-muted small mb-0">Select your preferences below to reserve a timeslot</p>
-            </div>
+<div class="container py-3 pt-0">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-6">
             
-            <div class="card-body p-4 pt-2">
-                <form action="{{ url_for('patient.book') }}" method="POST" class="needs-validation" novalidate>
-                    
-                    <div class="row g-2">
-                        <!-- Select Doctor / Specialist -->
-                        <div class="col-12 mb-1">
-                            <label for="doctor_id" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Specialist / Consultant *</label>
-                            <select class="form-select form-select-sm border-secondary-subtle bg-white rounded-1" id="doctor_id" name="doctor_id" required>
-                                <option value="" selected disabled>Choose a specialist...</option>
-                                {% for doctor in doctors %}
-                                    <option value="{{ doctor.id }}">
-                                        Dr. {{ doctor.first_name }} {{ doctor.last_name }} ({{ doctor.specialization }}) — ₱{{ "%.2f"|format(doctor.consultation_fee) }}
-                                    </option>
-                                {% endfor %}
-                            </select>
-                            <div class="invalid-feedback">Please choose a doctor.</div>
-                        </div>
+            <div class="mb-4">
+                <a href="{{ url_for('patient.dashboard') }}" class="text-primary small fw-semibold text-decoration-none d-inline-flex align-items-center gap-1">
+                    <i class="fa-solid fa-arrow-left small"></i> Back to Dashboard
+                </a>
+            </div>
 
-                        <!-- Date Selection -->
-                        <div class="col-12 mb-1">
-                            <label for="appointment_date" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Select Date *</label>
-                            <input type="date" class="form-control form-control-sm border-secondary-subtle bg-white rounded-1" id="appointment_date" name="appointment_date" required>
-                            <div class="invalid-feedback">Please choose a valid date.</div>
-                        </div>
-
-                        <!-- Time Selection (Sleek slot option picker) -->
-                        <div class="col-12 mb-1">
-                            <label for="appointment_time" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Select Time Slot *</label>
-                            <select class="form-select form-select-sm border-secondary-subtle bg-white rounded-1" id="appointment_time" name="appointment_time" required>
-                                <option value="" selected disabled>Choose clinic hour...</option>
-                                <option value="09:00:00">09:00 AM</option>
-                                <option value="10:00:00">10:00 AM</option>
-                                <option value="11:00:00">11:00 AM</option>
-                                <option value="13:00:00">01:00 PM</option>
-                                <option value="14:00:00">02:00 PM</option>
-                                <option value="15:00:00">03:00 PM</option>
-                                <option value="16:00:00">04:00 PM</option>
-                            </select>
-                            <div class="invalid-feedback">Please choose a time slot.</div>
-                        </div>
-
-                        <!-- Short Symptoms brief description input -->
-                        <div class="col-12 mb-3">
-                            <label for="symptoms" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Brief Reason for Visit (Optional)</label>
-                            <textarea class="form-control border-secondary-subtle bg-white rounded-1 small" id="symptoms" name="symptoms" rows="3" placeholder="Describe symptoms or treatment briefly..."></textarea>
-                        </div>
+            <div class="card border-0 shadow-sm rounded-3 bg-white overflow-hidden">
+                <div class="card-header border-0 bg-transparent pt-4 pb-2 px-4 text-center">
+                    <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 48px; height: 48px;">
+                        <i class="fa-solid fa-calendar-check fs-5"></i>
                     </div>
+                    <h3 class="fw-bold text-dark h4 mb-1">Book New Appointment</h3>
+                    <p class="text-muted small mb-0">Select your preferences below to reserve your clinic slot</p>
+                </div>
+                
+                <div class="card-body p-4 pt-3">
+                    <form action="{{ url_for('patient.book') }}" method="POST" class="needs-validation" novalidate>
+                        
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="doctor_id" class="form-label text-dark fw-semibold mb-1" style="font-size: 0.75rem; letter-spacing: 0.02em;">
+                                    Specialist / Consultant <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select border border-light-subtle bg-white rounded-2 py-2" id="doctor_id" name="doctor_id" required>
+                                    <option value="" selected disabled>Choose an available specialist...</option>
+                                    {% for doctor in doctors %}
+                                        <option value="{{ doctor.id }}">
+                                            Dr. {{ doctor.first_name }} {{ doctor.last_name }} ({{ doctor.specialization }}) — ₱{{ "%.2f"|format(doctor.consultation_fee) }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="invalid-feedback">Please select an attending professional.</div>
+                            </div>
 
-                    <!-- Booking submission -->
-                    <div>
-                        <button class="btn btn-dark btn-sm rounded-1 fw-bold py-2 text-uppercase w-100" type="submit">
-                            Confirm Booking
-                        </button>
-                    </div>
-                </form>
+                            <div class="col-12">
+                                <label for="appointment_date" class="form-label text-dark fw-semibold mb-1" style="font-size: 0.75rem; letter-spacing: 0.02em;">
+                                    Select Date <span class="text-danger">*</span>
+                                </label>
+                                <input type="date" class="form-control border border-light-subtle bg-white rounded-2 py-2" id="appointment_date" name="appointment_date" required>
+                                <div class="invalid-feedback">Please choose a valid dynamic clinical date.</div>
+                            </div>
+
+                            <div class="col-12">
+                                <label for="appointment_time" class="form-label text-dark fw-semibold mb-1" style="font-size: 0.75rem; letter-spacing: 0.02em;">
+                                    Select Time Slot <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-select border border-light-subtle bg-white rounded-2 py-2" id="appointment_time" name="appointment_time" required>
+                                    <option value="" selected disabled>Choose clinic operational hour...</option>
+                                    <option value="09:00:00">09:00 AM</option>
+                                    <option value="09:30:00">09:30 AM</option>
+                                    <option value="10:00:00">10:00 AM</option>
+                                    <option value="10:30:00">10:30 AM</option>
+                                    <option value="11:00:00">11:00 AM</option>
+                                    <option value="13:30:00">01:30 PM</option>
+                                    <option value="14:00:00">02:00 PM</option>
+                                    <option value="14:30:00">02:30 PM</option>
+                                    <option value="15:00:00">03:00 PM</option>
+                                    <option value="15:30:00">03:30 PM</option>
+                                    <option value="16:00:00">04:00 PM</option>
+                                </select>
+                                <div class="invalid-feedback">Please choose an available scheduling bracket.</div>
+                            </div>
+
+                            <div class="col-12 mb-2">
+                                <label for="symptoms" class="form-label text-dark fw-semibold mb-1" style="font-size: 0.75rem; letter-spacing: 0.02em;">
+                                    Brief Reason for Visit <span class="text-muted fw-normal">(Optional)</span>
+                                </label>
+                                <textarea class="form-control border border-light-subtle bg-white rounded-2 p-3" id="symptoms" name="symptoms" rows="3" placeholder="Describe clinical symptoms or treatment intentions briefly..."></textarea>
+                            </div>
+                        </div>
+
+                        <div class="pt-2">
+                            <button class="btn btn-primary rounded-2 fw-bold py-2.5 text-uppercase w-100 shadow-sm d-flex align-items-center justify-content-center gap-2" type="submit" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                                Secure Appointment <i class="fa-solid fa-check small"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
