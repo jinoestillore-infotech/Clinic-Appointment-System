@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Create Account - CareSync{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-5 p-3 pt-0 p-sm-0">
+        <!-- Main Registration Card (Pure Bootstrap 5 Minimalist) -->
+        <div class="card border-0 rounded-1 shadow my-3mt-0 bg-white">
+            
+            <!-- Minimalist Clean Header -->
+            <div class="card-header border-0 bg-transparent text-center pt-4 pb-2 px-4">
+                <h3 class="mb-1 fw-bold text-dark fs-4">Create Account</h3>
+            </div>
+
+            <!-- Form Body -->
+            <div class="card-body p-4 p-sm-5 pt-sm-2 pb-sm-1 pt-2">
+                <form action="{{ url_for('auth.register') }}" method="POST" class="needs-validation" novalidate>
+                    
+                    <!-- Section: Personal Info -->
+                    <div class="mb-2">
+                        <span class="text-uppercase text-dark fw-bold" style="font-size: 0.7rem; letter-spacing: 0.08em;">01. Personal Information</span>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <!-- First Name -->
+                        <div class="col-6">
+                            <label for="first_name" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">First Name *</label>
+                            <input type="text" class="form-control form-control-sm border-secondary-subtle bg-white rounded-1" id="first_name" name="first_name" required>
+                            <div class="invalid-feedback">Required</div>
+                        </div>
+                        
+                        <!-- Last Name -->
+                        <div class="col-6">
+                            <label for="last_name" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Last Name *</label>
+                            <input type="text" class="form-control form-control-sm border-secondary-subtle bg-white rounded-1" id="last_name" name="last_name" required>
+                            <div class="invalid-feedback">Required</div>
+                        </div>
+
+                        <!-- Email -->
+                        <div class="col-12">
+                            <label for="email" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Email Address *</label>
+                            <input type="email" class="form-control form-control-sm border-secondary-subtle bg-white rounded-1" id="email" name="email" required>
+                            <div class="invalid-feedback">Please enter a valid email.</div>
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="col-12">
+                            <label for="phone" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Mobile Number (Optional)</label>
+                            <input type="tel" class="form-control form-control-sm border-secondary-subtle bg-white rounded-1" id="phone" name="phone">
+                        </div>
+                    </div>
+
+                    <!-- Section: Credentials -->
+                    <div class="mb-2">
+                        <span class="text-uppercase text-dark fw-bold" style="font-size: 0.7rem; letter-spacing: 0.08em;">02. Account Security</span>
+                    </div>
+
+                    <div class="row g-2">
+                        <!-- Username -->
+                        <div class="col-12">
+                            <label for="username" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Choose Username *</label>
+                            <input type="text" class="form-control form-control-sm border-secondary-subtle bg-white rounded-1" id="username" name="username" required>
+                            <div class="invalid-feedback">Username is required.</div>
+                        </div>
+
+                        <!-- Password with Visibility Toggle -->
+                        <div class="col-12">
+                            <label for="password" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Set Password *</label>
+                            <div class="input-group input-group-sm">
+                                <input type="password" class="form-control border-secondary-subtle bg-white rounded-start-1" id="password" name="password" required minlength="6">
+                                <button class="btn btn-outline-secondary border-secondary-subtle bg-white text-dark rounded-end-1 px-3" type="button" id="togglePassword">
+                                    <i class="fa-regular fa-eye-slash" id="passwordIcon"></i>
+                                </button>
+                                <div class="invalid-feedback">Must be at least 6 characters.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Minimalist Native Bootstrap Button -->
+                    <div class="mt-4">
+                        <button class="btn btn-dark btn-sm rounded-1 fw-bold py-2 text-uppercase w-100" type="submit">
+                            Register Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Monochrome Footer Link -->
+            <div class="card-footer bg-transparent pb-4 pt-0 border-0 text-center">
+                <span class="text-muted small">Already registered?</span>
+                <a href="{{ url_for('auth.login') }}" class="text-dark fw-bold ms-1 text-decoration-underline small">Sign In Here</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Toggle Password Visibility (Touch typewriter helper)
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('password');
+    const passwordIcon = document.getElementById('passwordIcon');
+
+    togglePassword.addEventListener('click', function() {
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+        
+        // Toggle the eye icon
+        passwordIcon.classList.toggle('fa-eye');
+        passwordIcon.classList.toggle('fa-eye-slash');
+    });
+
+    // Native Bootstrap Form Validation
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>
+{% endblock %}

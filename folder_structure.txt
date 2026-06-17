@@ -1,0 +1,44 @@
+clinic_appointment_system/
+│
+├── app/
+│   ├── __init__.py          # Application factory (initializes Flask, MySQL, Bcrypt)
+│   ├── models.py            # Database schemas / SQL execution helper functions
+│   ├── config.py            # Environment configurations (DB URI, Secret Keys)
+│   │
+│   ├── routes/              # Blueprint routing for separation of concerns
+│   │   ├── __init__.py
+│   │   ├── auth.py          # Registration, Login, and Logout
+│   │   ├── patient.py       # Patient dashboard, booking, and history
+│   │   └── owner.py         # Owner dashboard, revenue metrics, staff tracking
+│   │
+│   ├── static/              # CSS, JS, and image assets
+│   │   ├── css/
+│   │   │   └── style.css    # Custom CSS tweaks
+│   │   ├── js/
+│   │   │   └── main.js      # Custom JS (e.g., AJAX for dynamic time slots)
+│   │   └── images/
+│   │       └── logo.png     # Clinic branding
+│   │
+│   └── templates/           # Jinja2 HTML Templates
+│       ├── base.html        # Main layout (Bootstrap 5 Boilerplate & Navbar)
+│       │
+│       ├── auth/            # Authentication Views
+│       │   ├── login.html
+│       │   └── register.html
+│       │
+│       ├── patient/         # Client / Patient Views
+│       │   ├── dashboard.html    # Patient profile & brief overview
+│       │   ├── book.html         # Appointment booking form
+│       │   └── history.html      # Past appointments & medical notes
+│       │
+│       └── owner/           # Clinic Owner Views
+│           ├── dashboard.html    # Financial charts & clinic pulse
+│           ├── staff.html        # Doctor management & roster shifts
+│           └── reports.html      # Detailed analytics export page
+│
+├── database/
+│   └── schema.sql           # Raw MySQL script to import into XAMPP phpMyAdmin
+│
+├── .gitignore               # Ignores __pycache__ and local env files
+├── requirements.txt         # Project dependencies
+└── run.py                   # Main entry point to launch the application

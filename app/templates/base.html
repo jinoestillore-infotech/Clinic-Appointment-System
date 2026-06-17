@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CareSync Clinic{% endblock %}</title>
+    <!-- Bootstrap 5 CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #fafafa;
+            color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        .navbar {
+            border-bottom: 1px solid #e5e5e5;
+        }
+        .navbar-brand {
+            font-weight: 800;
+            color: #000000 !important;
+            letter-spacing: -0.03em;
+        }
+        /* Global Minimalist Buttons */
+        .btn-black {
+            background-color: #000000;
+            color: #ffffff;
+            border: 1px solid #000000;
+            border-radius: 4px;
+            transition: all 0.15s ease-in-out;
+        }
+        .btn-black:hover, .btn-black:focus, .btn-black:active {
+            background-color: #222222;
+            color: #ffffff;
+            border-color: #222222;
+        }
+        .btn-outline-black {
+            background-color: transparent;
+            color: #000000;
+            border: 1px solid #000000;
+            border-radius: 4px;
+            transition: all 0.15s ease-in-out;
+        }
+        .btn-outline-black:hover, .btn-outline-black:focus, .btn-outline-black:active {
+            background-color: #000000;
+            color: #ffffff;
+            border-color: #000000;
+        }
+        /* Minimalist Alerts */
+        .alert {
+            border-radius: 4px;
+            border: 1px solid #e5e5e5;
+            background-color: #ffffff;
+            color: #000000;
+        }
+        footer {
+            margin-top: auto;
+            border-top: 1px solid #e5e5e5;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Minimalist Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white py-1">
+        <div class="container">
+            <a class="navbar-brand text-uppercase" href="#">
+                CareSync
+            </a>
+            <button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
+                <i class="fa-solid fa-bars text-dark fs-4"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-lg-center mt-1 mt-lg-0">
+                    {% if session.get('user_id') %}
+                        <li class="nav-item">
+                            <a class="btn text-danger" href="{{ url_for('auth.logout') }}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link text-dark small px-lg-3" href="{{ url_for('auth.login') }}">Login</a>
+                        </li>
+                        <li class="nav-item mt-2 mt-lg-0">
+                            <a class="btn btn-black btn-sm rounded-1 px-3" href="{{ url_for('auth.register') }}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages Handler -->
+    <div class="container mt-4">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-dismissible fade show shadow-sm" role="alert">
+                        <i class="fa-solid {% if category == 'success' %}fa-circle-check{% else %}fa-circle-exclamation{% endif %} me-2 text-dark"></i>
+                        <span class="small">{{ message }}</span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="filter: grayscale(1);"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="container py-3">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Bootstrap 5 JS Bundle CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Global Native JS Auto-Dismiss logic for alert notifications -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function (alert) {
+                setTimeout(function () {
+                    alert.style.transition = 'opacity 0.5s ease-in-out, transform 0.3s ease-in-out';
+                    alert.style.opacity = '0';
+                    alert.style.transform = 'translateY(-10px)';
+                    setTimeout(function () {
+                        alert.remove();
+                    }, 500);
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

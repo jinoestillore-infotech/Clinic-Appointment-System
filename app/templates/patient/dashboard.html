@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - CareSync{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+    <!-- Welcome Header Segment -->
+    <div class="col-12 mb-2">
+        <div class="d-flex align-items-center justify-content-between border-bottom pb-3">
+            <div>
+                <span class="text-uppercase text-muted fw-bold small d-block" style="font-size: 0.65rem; letter-spacing: 0.1em;">Patient Portal</span>
+                <h2 class="h4 fw-bold text-dark mb-0">Welcome, {{ session.get('first_name', 'Patient') }}</h2>
+            </div>
+            <span class="badge border border-dark text-dark rounded-1 px-2 py-1.5 small fw-bold text-uppercase" style="font-size: 0.65rem;">Active Member</span>
+        </div>
+    </div>
+
+    <!-- LEFT COLUMN: Patient Overview & Actions -->
+    <div class="col-12 col-md-5">
+        <!-- BOOKING CARD MODULE -->
+        <div class="card border rounded-1 shadow-sm mb-3 bg-white">
+            <div class="card-body p-4">
+                <h4 class="h5 fw-bold text-dark mb-1">Book Appointment</h4>
+                <p class="text-muted small mb-4">Select an available specialist, choose your preferred clinic hour, and schedule your appointment instantly.</p>
+                
+                <a href="{{ url_for('patient.book') }}" class="btn btn-dark btn-sm rounded-1 fw-bold w-100 py-2 text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                    Schedule Appointment <i class="fa-solid fa-chevron-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+
+        <!-- HEALTH PROFILE SUMMARY MODULE -->
+        <div class="card border border-secondary-subtle rounded-1 shadow-sm mb-3 bg-white">
+            <div class="card-header bg-transparent border-0 pt-3 pb-1">
+                <span class="text-uppercase text-dark fw-bold" style="letter-spacing: 0.08em;">Health Profile</span>
+            </div>
+            <div class="card-body py-2 px-3">
+                <div class="row g-2 text-center">
+                    <div class="col-6 border-end border-light-subtle">
+                        <span class="text-muted d-block small" style="font-size: 0.7rem;">Blood Type</span>
+                        <strong class="text-dark">O-Positive</strong>
+                    </div>
+                    <div class="col-6">
+                        <span class="text-muted d-block small" style="font-size: 0.7rem;">Primary Clinic</span>
+                        <strong class="text-dark">CareSync Main</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0 text-center pb-3 pt-2">
+                <a href="#" class="text-dark small text-decoration-underline" style="font-size: 0.7rem;">Edit Profile Information</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT COLUMN: Appointments List & Medical Records -->
+    <div class="col-12 col-md-7">
+        <!-- UPCOMING APPOINTMENTS LIST MODULE -->
+        <div class="card border border-secondary-subtle rounded-1 shadow-sm mb-3 bg-white">
+            <div class="card-header bg-transparent border-bottom border-light-subtle py-3 d-flex align-items-center justify-content-between">
+                <span class="text-uppercase text-dark fw-bold mb-0" style="letter-spacing: 0.08em;">Upcoming Schedules</span>
+                <span class="badge bg-dark rounded-pill px-2.5 py-1" style="font-size: 0.65rem;">{{ upcoming|length }} Active</span>
+            </div>
+            <div class="card-body p-0">
+                {% if not upcoming %}
+                    <!-- If there are no upcoming appointments -->
+                    <div class="text-center py-5 px-3">
+                        <i class="fa-regular fa-calendar-check text-muted mb-2 fs-3"></i>
+                        <p class="text-muted small mb-0">You have no upcoming clinic appointments scheduled.</p>
+                    </div>
+                {% else %}
+                    <!-- Dynamic List of Appointments -->
+                    {% for appt in upcoming %}
+                        <div class="p-3 border-bottom border-light-subtle">
+                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                <!-- Main Info Block with Left Accent Border -->
+                                <div class="border-start border-2 border-dark ps-2">
+                                    <span class="text-uppercase text-muted fw-bold d-block" style="font-size: .8rem; letter-spacing: 0.05em;">
+                                        {{ appt.appointment_date }} at {{ appt.appointment_time }}
+                                    </span>
+                                    <strong class="text-dark d-block" style="font-size: 0.95rem;">Dr. {{ appt.doc_first }} {{ appt.doc_last }}</strong>
+                                    <span class="text-muted d-block small" style="font-size: 0.75rem;">{{ appt.specialization }}</span>
+                                </div>
+                                <!-- Status Badge Block -->
+                                <div class="text-end flex-shrink-0">
+                                    <span class="badge border {% if appt.status == 'Confirmed' %}border-dark text-dark bg-white{% else %}border-warning text-dark bg-warning{% endif %} text-uppercase rounded-1 px-2 py-1" style="font-size: 0.55rem; letter-spacing: 0.05em;">
+                                        {{ appt.status }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Optional Patient Symptoms Summary -->
+                            {% if appt.symptoms_brief %}
+                                <div class="mt-2 text-muted small bg-light p-2 rounded-1" style="font-size: 0.7rem; line-height: 1.35;">
+                                    <strong class="text-dark">Reason:</strong> {{ appt.symptoms_brief }}
+                                </div>
+                            {% endif %}
+
+                            <!-- Action Bar & Billing Segment -->
+                            <div class="d-flex align-items-center justify-content-between mt-2 pt-2 border-top border-light-subtle">
+                                <span class="small text-dark" style="font-size: 0.8rem;">
+                                    Fee: <strong class="text-dark">₱{{ "%.2f"|format(appt.amount_due) }}</strong> 
+                                    <span class="badge {% if appt.payment_status == 'Paid' %}border border-dark text-dark bg-white{% else %}border border-danger-subtle text-danger bg-white{% endif %} ms-1" style="font-size: 0.66rem;">
+                                        {{ appt.payment_status }}
+                                    </span>
+                                </span>
+                                <form action="{{ url_for('patient.cancel', appointment_id=appt.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this appointment?');" class="m-0">
+                                    <button type="submit" class="btn btn-danger btn-lg py-1 px-2 rounded-3 text-uppercase fw-bold" style="font-size: 0.84rem; letter-spacing: 0.05em;">
+                                        Cancel Schedule
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- MEDICAL BRIEFINGS & PAST VISITS -->
+        <div class="card border border-secondary-subtle rounded-1 shadow-sm bg-white">
+            <div class="card-header bg-transparent border-bottom border-light-subtle py-3">
+                <span class="text-uppercase text-dark fw-bold mb-0" style="letter-spacing: 0.08em;">Recent Clinic Consultations</span>
+            </div>
+            <div class="card-body p-0">
+                {% if not past %}
+                    <!-- Empty State -->
+                    <div class="text-center py-5 px-3">
+                        <i class="fa-solid fa-receipt text-muted mb-2 fs-3"></i>
+                        <p class="text-muted small mb-0">No past medical histories or briefings found.</p>
+                    </div>
+                {% else %}
+                    <!-- Dynamic Past Visits List -->
+                    {% for appt in past %}
+                        <div class="p-3 border-bottom border-light-subtle">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong class="text-dark d-block">Dr. {{ appt.doc_first }} {{ appt.doc_last }}</strong>
+                                    <span class="text-muted small">{{ appt.specialization }}</span>
+                                    <div class="text-muted mt-1 small" style="font-size: 0.7rem;">
+                                        <i class="fa-regular fa-calendar-check me-1"></i> {{ appt.appointment_date }}
+                                    </div>
+                                </div>
+                                <span class="badge {% if appt.status == 'Completed' %}bg-secondary text-white{% else %}bg-danger-subtle text-danger{% endif %} text-uppercase rounded-1" style="font-size: 0.6rem;">
+                                    {{ appt.status }}
+                                </span>
+                            </div>
+                            {% if appt.medical_notes %}
+                                <div class="mt-2 p-2 bg-light rounded-1 border-start border-dark small" style="font-size: 0.75rem;">
+                                    <strong>Medical Briefing Notes:</strong><br>
+                                    <span class="text-dark">{{ appt.medical_notes }}</span>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

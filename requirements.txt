@@ -1,0 +1,4 @@
+Flask==3.0.3
+Flask-Bcrypt==1.0.1
+mysql-connector-python==9.0.0
+cryptography==42.0.5
