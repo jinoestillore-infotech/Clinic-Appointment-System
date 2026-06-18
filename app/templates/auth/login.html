@@ -3,35 +3,33 @@
 {% block title %}Sign In - CareSync{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center align-items-center">
+<div class="row justify-content-center align-items-center pt-0">
     <div class="col-12 col-sm-10 col-md-8 col-lg-5">
-        <!-- Main Login Card (Pure Bootstrap 5 Minimalist) -->
-        <div class="card border border-secondary-subtle rounded-1 shadow-sm my-3 bg-white">
+        <div class="card border-0 shadow-sm rounded-3 m-0 bg-white">
             
-            <!-- Minimalist Clean Header -->
-            <div class="card-header border-0 bg-transparent text-center pt-4 pb-2 px-4">
+            <div class="card-header border-0 bg-transparent text-center pt-3 pb-2 px-4">
+                <div class="text-primary fs-2 mb-2">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                </div>
                 <h3 class="mb-1 fw-bold text-dark fs-4">Sign In</h3>
                 <p class="mb-0 text-muted small">Access your CareSync patient profile</p>
             </div>
 
-            <!-- Form Body -->
-            <div class="card-body p-4 p-sm-5 pt-2">
+            <div class="card-body p-4 p-sm-5 pt-3">
                 <form action="{{ url_for('auth.login') }}" method="POST" class="needs-validation" novalidate>
                     
-                    <div class="row g-2 mb-3">
-                        <!-- Username -->
+                    <div class="row g-3 mb-3">
                         <div class="col-12">
-                            <label for="username" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Username</label>
-                            <input type="text" class="form-control form-control-sm border-secondary-subtle bg-white rounded-1" id="username" name="username" required>
+                            <label for="username" class="form-label text-secondary fw-semibold mb-1" style="font-size: 0.75rem; letter-spacing: 0.05em;">USERNAME</label>
+                            <input type="text" class="form-control form-control-md border-light-subtle bg-light-subtle rounded-2 px-3 small" id="username" name="username" required>
                             <div class="invalid-feedback">Please enter your username.</div>
                         </div>
 
-                        <!-- Password with Visibility Toggle -->
                         <div class="col-12">
-                            <label for="password" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Password</label>
-                            <div class="input-group input-group-sm">
-                                <input type="password" class="form-control border-secondary-subtle bg-white rounded-start-1" id="password" name="password" required>
-                                <button class="btn btn-outline-secondary border-secondary-subtle bg-white text-dark rounded-end-1 px-3" type="button" id="togglePassword">
+                            <label for="password" class="form-label text-secondary fw-semibold mb-1" style="font-size: 0.75rem; letter-spacing: 0.05em;">PASSWORD</label>
+                            <div class="input-group input-group-md needs-validation-group">
+                                <input type="password" class="form-control border-light-subtle bg-light-subtle rounded-start-2 px-3 small" id="password" name="password" required>
+                                <button class="btn btn-outline-secondary border-light-subtle bg-light-subtle text-secondary rounded-end-2 px-3" type="button" id="togglePassword">
                                     <i class="fa-regular fa-eye-slash" id="passwordIcon"></i>
                                 </button>
                                 <div class="invalid-feedback">Please enter your password.</div>
@@ -39,37 +37,42 @@
                         </div>
                     </div>
 
-                    <!-- Remember Me checkbox & Forget password placeholders in minimalist typography -->
-                    <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4 pt-1">
                         <div class="form-check">
-                            <input class="form-check-input border-secondary-subtle" type="checkbox" id="rememberMe">
-                            <label class="form-check-label text-secondary small" for="rememberMe" style="font-size: 0.75rem;">
+                            <input class="form-check-input border-light-subtle" type="checkbox" id="rememberMe">
+                            <label class="form-check-label text-secondary small fw-medium" for="rememberMe" style="font-size: 0.75rem;">
                                 Remember me
                             </label>
                         </div>
-                        <a href="#" class="text-secondary small text-decoration-none" style="font-size: 0.75rem;">Forgot?</a>
+                        <a href="#" class="text-primary small text-decoration-none fw-medium" style="font-size: 0.75rem;">Forgot Password?</a>
                     </div>
 
-                    <!-- Minimalist Native Bootstrap Button -->
                     <div>
-                        <button class="btn btn-dark btn-sm rounded-1 fw-bold py-2 text-uppercase w-100" type="submit">
-                            Sign In
+                        <button class="btn btn-primary rounded-2 fw-bold py-2.5 text-uppercase w-100 shadow-sm tracking-wider" style="font-size: 0.75rem;" type="submit">
+                            Sign In <i class="fa-solid fa-right-to-bracket ms-1 small"></i>
                         </button>
                     </div>
                 </form>
             </div>
 
-            <!-- Monochrome Footer Link -->
-            <div class="card-footer bg-transparent pb-4 pt-0 border-0 text-center">
+            <div class="card-footer bg-transparent pb-5 pt-0 border-0 text-center">
                 <span class="text-muted small">New to CareSync?</span>
-                <a href="{{ url_for('auth.register') }}" class="text-dark fw-bold ms-1 text-decoration-underline small">Create Account</a>
+                <a href="{{ url_for('auth.register') }}" class="text-primary fw-bold ms-1 text-decoration-none small">Create Account</a>
             </div>
         </div>
     </div>
 </div>
 
+<style>
+    /* Helper layout style for validation error alignment in input groups */
+    .needs-validation-group { flex-wrap: wrap; }
+    .needs-validation-group .invalid-feedback { display: none; width: 100%; margin-top: 0.25rem; }
+    .was-validated .needs-validation-group .form-control:invalid ~ .invalid-feedback { display: block; }
+    .min-vh-75 { min-height: 75vh; }
+</style>
+
 <script>
-    // Toggle Password Visibility (Touch typewriter helper)
+    // Toggle Password Visibility
     const togglePassword = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
     const passwordIcon = document.getElementById('passwordIcon');

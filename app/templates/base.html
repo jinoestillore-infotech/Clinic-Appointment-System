@@ -4,88 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}CareSync Clinic{% endblock %}</title>
-    <!-- Bootstrap 5 CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body {
-            background-color: #fafafa;
-            color: #1a1a1a;
+            background-color: #f8f9fa;
+            color: #212529;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
         .navbar {
-            border-bottom: 1px solid #e5e5e5;
+            border-bottom: 1px solid #eef0f3;
         }
         .navbar-brand {
             font-weight: 800;
-            color: #000000 !important;
-            letter-spacing: -0.03em;
+            color: #0d6efd !important;
+            letter-spacing: -0.02em;
         }
-        /* Global Minimalist Buttons */
-        .btn-black {
-            background-color: #000000;
-            color: #ffffff;
-            border: 1px solid #000000;
-            border-radius: 4px;
-            transition: all 0.15s ease-in-out;
+        .nav-link-custom {
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+            transition: color 0.15s ease-in-out;
         }
-        .btn-black:hover, .btn-black:focus, .btn-black:active {
-            background-color: #222222;
-            color: #ffffff;
-            border-color: #222222;
+        .nav-link-custom:hover {
+            color: #0d6efd !important;
         }
-        .btn-outline-black {
-            background-color: transparent;
-            color: #000000;
-            border: 1px solid #000000;
-            border-radius: 4px;
-            transition: all 0.15s ease-in-out;
-        }
-        .btn-outline-black:hover, .btn-outline-black:focus, .btn-outline-black:active {
-            background-color: #000000;
-            color: #ffffff;
-            border-color: #000000;
-        }
-        /* Minimalist Alerts */
-        .alert {
-            border-radius: 4px;
-            border: 1px solid #e5e5e5;
+        /* Refined Contextual Dashboard Alerts */
+        .alert-dashboard {
+            border-radius: 8px;
+            font-size: 0.85rem;
+            border: 1px solid transparent;
             background-color: #ffffff;
-            color: #000000;
+        }
+        .alert-dashboard.alert-success {
+            color: #0f5132;
+            background-color: #d1e7dd;
+            border-color: #badbcc;
+        }
+        .alert-dashboard.alert-danger {
+            color: #842029;
+            background-color: #f8d7da;
+            border-color: #f5c2c7;
+        }
+        .alert-dashboard.alert-warning {
+            color: #664d03;
+            background-color: #fff3cd;
+            border-color: #ffecb5;
+        }
+        .alert-dashboard.alert-info {
+            color: #055160;
+            background-color: #cff4fc;
+            border-color: #b6effb;
         }
         footer {
             margin-top: auto;
-            border-top: 1px solid #e5e5e5;
+            border-top: 1px solid #eef0f3;
         }
     </style>
 </head>
 <body>
 
-    <!-- Minimalist Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white py-1">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white py-2.5 shadow-sm sticky-top">
         <div class="container">
-            <a class="navbar-brand text-uppercase" href="#">
-                CareSync
+            <a class="navbar-brand text-uppercase d-flex align-items-center gap-2" href="#">
+                <i class="fa-solid fa-heart-pulse"></i> CareSync
             </a>
             <button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="Toggle navigation">
                 <i class="fa-solid fa-bars text-dark fs-4"></i>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-lg-center mt-1 mt-lg-0">
+                <ul class="navbar-nav ms-auto align-items-lg-center mt-2 mt-lg-0 gap-2">
                     {% if session.get('user_id') %}
                         <li class="nav-item">
-                            <a class="btn text-danger" href="{{ url_for('auth.logout') }}">Logout</a>
+                            <span class="text-muted small me-2 d-none d-lg-inline-block">Logged in as {{ session.get('first_name', 'Patient') }}</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-outline-danger btn-sm rounded-2 fw-semibold px-3 text-uppercase tracking-wider" style="font-size: 0.7rem;" href="{{ url_for('auth.logout') }}">
+                                <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+                            </a>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link text-dark small px-lg-3" href="{{ url_for('auth.login') }}">Login</a>
+                            <a class="nav-link text-secondary fw-bold text-uppercase nav-link-custom px-lg-3" href="{{ url_for('auth.login') }}">Login</a>
                         </li>
-                        <li class="nav-item mt-2 mt-lg-0">
-                            <a class="btn btn-black btn-sm rounded-1 px-3" href="{{ url_for('auth.register') }}">Register</a>
+                        <li class="nav-item mt-1 mt-lg-0">
+                            <a class="btn btn-primary btn-sm rounded-2 fw-bold text-uppercase px-3 shadow-sm tracking-wider" style="font-size: 0.7rem;" href="{{ url_for('auth.register') }}">Register</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -93,33 +98,31 @@
         </div>
     </nav>
 
-    <!-- Flash Messages Handler -->
     <div class="container mt-4">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="alert alert-dismissible fade show shadow-sm" role="alert">
-                        <i class="fa-solid {% if category == 'success' %}fa-circle-check{% else %}fa-circle-exclamation{% endif %} me-2 text-dark"></i>
-                        <span class="small">{{ message }}</span>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="filter: grayscale(1);"></button>
+                    <div class="alert alert-dashboard alert-{{ category if category in ['success', 'danger', 'warning', 'info'] else 'primary' }} alert-dismissible fade show shadow-sm p-3 mb-3 d-flex align-items-center justify-content-between" role="alert">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fa-solid {% if category == 'success' %}fa-circle-check{% elif category == 'danger' %}fa-circle-xmark{% elif category == 'warning' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %} fs-5 opacity-90"></i>
+                            <span class="fw-medium">{{ message }}</span>
+                        </div>
+                        <button type="button" class="btn-close position-static p-0 ms-2" data-bs-dismiss="alert" aria-label="Close" style="font-size: 0.8rem;"></button>
                     </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
     </div>
 
-    <!-- Main Content Area -->
     <main class="container py-3">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Bootstrap 5 JS Bundle CDN -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Global Native JS Auto-Dismiss logic for alert notifications -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const alerts = document.querySelectorAll('.alert');
+            const alerts = document.querySelectorAll('.alert-dashboard');
             alerts.forEach(function (alert) {
                 setTimeout(function () {
                     alert.style.transition = 'opacity 0.5s ease-in-out, transform 0.3s ease-in-out';
@@ -128,7 +131,7 @@
                     setTimeout(function () {
                         alert.remove();
                     }, 500);
-                }, 2000);
+                }, 4000); // Extended timeout slightly to allow easier reading of longer system notes
             });
         });
     </script>
