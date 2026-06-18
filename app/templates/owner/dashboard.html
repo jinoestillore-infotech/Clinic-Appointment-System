@@ -6,7 +6,6 @@
 <div class="container py-2">
     <div class="row g-4">
         
-        <!-- Header Segment -->
         <div class="col-12">
             <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between border-bottom pb-4 mb-2 gap-3">
                 <div>
@@ -14,14 +13,13 @@
                     <h2 class="h3 fw-bold text-dark mb-0">Clinic System Overview</h2>
                 </div>
                 <div>
-                    <button type="button" class="btn btn-dark btn-sm rounded-1 px-3 py-2 fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;" data-bs-toggle="modal" data-bs-target="#addDoctorModal">
+                    <button type="button" class="btn btn-primary btn-sm rounded-2 px-3 py-2 fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;" data-bs-toggle="modal" data-bs-target="#addDoctorModal">
                         <i class="fa-solid fa-plus me-1"></i> Register New Doctor
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Metrics Overview Grid Row -->
         <div class="col-12">
             <div class="row g-3">
                 <div class="col-6 col-md-4">
@@ -70,38 +68,56 @@
             </div>
         </div>
 
-        <!-- DOCTORS ROSTER SECTION -->
         <div class="col-12 mt-4">
-            <div class="border-bottom pb-2 mb-3">
-                <h3 class="h6 text-uppercase fw-bold text-secondary mb-0" style="letter-spacing: 0.08em;">Active Medical Practitioners</h3>
+            <div class="d-flex align-items-center justify-content-between pb-3 mb-1">
+                <span class="text-uppercase text-secondary fw-bold mb-0" style="letter-spacing: 0.08em;">Active Medical Practitioners</span>
+                <span class="badge bg-dark-subtle text-dark rounded-pill px-3 py-1.5 fw-semibold small">{{ doctors|length }} Providers</span>
             </div>
             
             {% if not doctors %}
-                <div class="text-center py-5 bg-white border border-dashed rounded-3 shadow-sm">
-                    <i class="fa-solid fa-user-slash text-muted display-4 opacity-50 mb-3"></i>
-                    <p class="text-secondary mb-0 fw-medium">No medical staff have been registered yet.</p>
+                <div class="bg-white text-center py-5 px-3 rounded-3 shadow-sm border">
+                    <div class="text-muted mb-3">
+                        <i class="fa-solid fa-user-slash display-4 opacity-50"></i>
+                    </div>
+                    <p class="text-secondary fw-medium mb-0">No medical staff have been registered yet.</p>
                 </div>
             {% else %}
                 <div class="row g-3">
                     {% for doc in doctors %}
                         <div class="col-12 col-md-6 col-lg-4">
-                            <div class="card border-0 shadow-sm rounded-3 h-100 bg-white d-flex flex-column justify-content-between">
-                                <div class="card-body p-4">
-                                    <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
-                                        <div class="border-start border-4 border-dark ps-2">
+                            <div class="card border-0 shadow-sm rounded-3 bg-white p-4 position-relative card-hover mb-1 h-100 d-flex flex-column justify-content-between">
+                                <div>
+                                    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-3 mb-3">
+                                        <div class="border-start border-4 border-primary ps-3">
+                                            <span class="text-uppercase text-primary fw-bold d-inline-flex align-items-center gap-1 mb-1 small" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                                                <i class="fa-solid fa-stethoscope"></i> Practitioner
+                                            </span>
                                             <h4 class="h5 fw-bold text-dark mb-1">Dr. {{ doc.first_name }} {{ doc.last_name }}</h4>
-                                            <span class="text-muted small fw-semibold"><i class="fa-solid fa-stethoscope me-1 opacity-70"></i> {{ doc.specialization }}</span>
+                                            <span class="text-muted small fw-medium">
+                                                {{ doc.specialization }}
+                                            </span>
                                         </div>
-                                        <span class="badge rounded-pill px-2.5 py-1.5 fw-bold text-uppercase border {% if doc.is_active %}bg-success-subtle text-success border-success-subtle{% else %}bg-secondary-subtle text-secondary border-secondary-subtle{% endif %}" style="font-size: 0.65rem;">
-                                            {% if doc.is_active %}Active{% else %}Inactive{% endif %}
-                                        </span>
+                                        <div class="text-end flex-shrink-0">
+                                            <span class="badge rounded-pill px-3 py-2 fw-bold text-uppercase border tracking-wider {% if doc.is_active %}bg-primary-subtle text-primary border-primary-subtle{% else %}bg-warning-subtle text-warning border-warning-subtle{% endif %}" style="font-size: 0.65rem;">
+                                                <i class="fa-solid fa-circle me-1 small opacity-75"></i> {% if doc.is_active %}Active{% else %}On Leave{% endif %}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div class="bg-light p-3 rounded-2 border border-light-subtle text-dark small" style="font-size: 0.75rem;">
-                                        Consultation Rate: <strong class="text-dark">₱{{ "%.2f"|format(doc.consultation_fee) }}</strong>
+
+                                    <div class="mt-3 text-dark bg-light p-3 rounded-2 border border-light-subtle" style="font-size: 0.75rem; line-height: 1.4;">
+                                        <span class="text-uppercase text-muted d-block fw-bold mb-1" style="font-size: 0.65rem; letter-spacing: 0.05em;">Pricing Schedule</span>
+                                        Standard Consultation Rate Base
                                     </div>
                                 </div>
-                                <div class="card-footer bg-light border-0 px-4 py-3 text-end">
-                                    <button type="button" class="btn btn-outline-black btn-sm rounded-2 fw-semibold px-3 py-1.5 text-uppercase btn-edit-trigger" style="font-size: 0.7rem;"
+
+                                <div class="d-flex flex-column flex-sm-row align-items-stretch align-items-sm-center justify-content-between gap-3 mt-3 pt-3 border-top border-light-subtle">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="text-muted small">Session Fee:</span>
+                                        <strong class="text-dark fs-5 fw-bold">₱{{ "%.2f"|format(doc.consultation_fee) }}</strong> 
+                                    </div>
+                                    <button type="button" 
+                                            class="btn btn-primary btn-sm rounded-2 fw-semibold px-3 py-2 btn-edit-trigger text-nowrap align-self-stretch align-self-sm-center" 
+                                            style="font-size: 0.8rem;"
                                             data-id="{{ doc.id }}"
                                             data-first-name="{{ doc.first_name }}"
                                             data-last-name="{{ doc.last_name }}"
@@ -120,7 +136,6 @@
     </div>
 </div>
 
-<!-- ADD DOCTOR MODAL -->
 <div class="modal fade" id="addDoctorModal" tabindex="-1" aria-labelledby="addDoctorModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
@@ -134,56 +149,55 @@
                 <div class="modal-body p-4">
                     <div class="row g-2 mb-3">
                         <div class="col-6">
-                            <label for="first_name" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">First Name *</label>
-                            <input type="text" class="form-control form-control-sm border-secondary-subtle rounded-1" name="first_name" required>
+                            <label for="first_name" class="form-label text-dark fw-semibold small mb-1" style="font-size: 0.75rem;">First Name *</label>
+                            <input type="text" class="form-control border-secondary-subtle rounded-2 p-2.5 small" name="first_name" required>
                         </div>
                         <div class="col-6">
-                            <label for="last_name" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Last Name *</label>
-                            <input type="text" class="form-control form-control-sm border-secondary-subtle rounded-1" name="last_name" required>
+                            <label for="last_name" class="form-label text-dark fw-semibold small mb-1" style="font-size: 0.75rem;">Last Name *</label>
+                            <input type="text" class="form-control border-secondary-subtle rounded-2 p-2.5 small" name="last_name" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="specialization" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Specialization *</label>
-                        <input type="text" class="form-control form-control-sm border-secondary-subtle rounded-1" name="specialization" placeholder="e.g. Cardiology" required>
+                        <label for="specialization" class="form-label text-dark fw-semibold small mb-1" style="font-size: 0.75rem;">Specialization *</label>
+                        <input type="text" class="form-control border-secondary-subtle rounded-2 p-2.5 small" name="specialization" placeholder="e.g. Cardiology" required>
                     </div>
                     <div class="row g-2 mb-3">
                         <div class="col-6">
-                            <label for="consultation_fee" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Consultation Fee *</label>
-                            <input type="number" step="0.01" class="form-control form-control-sm border-secondary-subtle rounded-1" name="consultation_fee" value="500.00" required>
+                            <label for="consultation_fee" class="form-label text-dark fw-semibold small mb-1" style="font-size: 0.75rem;">Consultation Fee *</label>
+                            <input type="number" step="0.01" class="form-control border-secondary-subtle rounded-2 p-2.5 small" name="consultation_fee" value="500.00" required>
                         </div>
                         <div class="col-6">
-                            <label for="phone" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Contact Number</label>
-                            <input type="tel" class="form-control form-control-sm border-secondary-subtle rounded-1" name="phone">
+                            <label for="phone" class="form-label text-dark fw-semibold small mb-1" style="font-size: 0.75rem;">Contact Number</label>
+                            <input type="tel" class="form-control border-secondary-subtle rounded-2 p-2.5 small" name="phone">
                         </div>
                     </div>
                     
-                    <span class="text-uppercase text-secondary d-block fw-bold mb-2" style="font-size: 0.65rem; letter-spacing: 0.08em;">Portal Credentials</span>
+                    <span class="text-uppercase text-secondary d-block fw-bold mb-2 pt-2 border-top border-light-subtle" style="font-size: 0.65rem; letter-spacing: 0.08em;">Portal Credentials</span>
                     
                     <div class="mb-3">
-                        <label for="username" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">System Username *</label>
-                        <input type="text" class="form-control form-control-sm border-secondary-subtle rounded-1" name="username" required>
+                        <label for="username" class="form-label text-dark fw-semibold small mb-1" style="font-size: 0.75rem;">System Username *</label>
+                        <input type="text" class="form-control border-secondary-subtle rounded-2 p-2.5 small" name="username" required>
                     </div>
                     <div class="row g-2">
                         <div class="col-6">
-                            <label for="email" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Email Address *</label>
-                            <input type="email" class="form-control form-control-sm border-secondary-subtle rounded-1" name="email" required>
+                            <label for="email" class="form-label text-dark fw-semibold small mb-1" style="font-size: 0.75rem;">Email Address *</label>
+                            <input type="email" class="form-control border-secondary-subtle rounded-2 p-2.5 small" name="email" required>
                         </div>
                         <div class="col-6">
-                            <label for="password" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Login Password *</label>
-                            <input type="password" class="form-control form-control-sm border-secondary-subtle rounded-1" name="password" required minlength="6">
+                            <label for="password" class="form-label text-dark fw-semibold small mb-1" style="font-size: 0.75rem;">Login Password *</label>
+                            <input type="password" class="form-control border-secondary-subtle rounded-2 p-2.5 small" name="password" required minlength="6">
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer bg-light px-4 py-3 d-flex justify-content-end gap-2">
                     <button type="button" class="btn btn-light border rounded-2 fw-semibold px-3" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-dark rounded-2 fw-semibold px-4">Register Doctor</button>
+                    <button type="submit" class="btn btn-primary rounded-2 fw-semibold px-4">Register Doctor</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- EDIT DOCTOR MODAL -->
 <div class="modal fade" id="editDoctorModal" tabindex="-1" aria-labelledby="editDoctorModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
@@ -197,26 +211,26 @@
                 <div class="modal-body p-4">
                     <div class="row g-2 mb-3">
                         <div class="col-6">
-                            <label for="edit_first_name" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">First Name *</label>
-                            <input type="text" class="form-control form-control-sm border-secondary-subtle rounded-1" id="edit_first_name" name="first_name" required>
+                            <label for="edit_first_name" class="form-label text-dark fw-semibold small mb-1" style="font-size: 0.75rem;">First Name *</label>
+                            <input type="text" class="form-control border-secondary-subtle rounded-2 p-2.5 small" id="edit_first_name" name="first_name" required>
                         </div>
                         <div class="col-6">
-                            <label for="edit_last_name" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Last Name *</label>
-                            <input type="text" class="form-control form-control-sm border-secondary-subtle rounded-1" id="edit_last_name" name="last_name" required>
+                            <label for="edit_last_name" class="form-label text-dark fw-semibold small mb-1" style="font-size: 0.75rem;">Last Name *</label>
+                            <input type="text" class="form-control border-secondary-subtle rounded-2 p-2.5 small" id="edit_last_name" name="last_name" required>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label for="edit_specialization" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Specialization *</label>
-                        <input type="text" class="form-control form-control-sm border-secondary-subtle rounded-1" id="edit_specialization" name="specialization" required>
+                        <label for="edit_specialization" class="form-label text-dark fw-semibold small mb-1" style="font-size: 0.75rem;">Specialization *</label>
+                        <input type="text" class="form-control border-secondary-subtle rounded-2 p-2.5 small" id="edit_specialization" name="specialization" required>
                     </div>
                     <div class="row g-2 mb-3">
                         <div class="col-6">
-                            <label for="edit_consultation_fee" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Consultation Fee *</label>
-                            <input type="number" step="0.01" class="form-control form-control-sm border-secondary-subtle rounded-1" id="edit_consultation_fee" name="consultation_fee" required>
+                            <label for="edit_consultation_fee" class="form-label text-dark fw-semibold small mb-1" style="font-size: 0.75rem;">Consultation Fee *</label>
+                            <input type="number" step="0.01" class="form-control border-secondary-subtle rounded-2 p-2.5 small" id="edit_consultation_fee" name="consultation_fee" required>
                         </div>
                         <div class="col-6">
-                            <label for="edit_is_active" class="form-label text-secondary small mb-1" style="font-size: 0.75rem;">Practitioner Status *</label>
-                            <select class="form-select form-select-sm border-secondary-subtle rounded-1" id="edit_is_active" name="is_active" required>
+                            <label for="edit_is_active" class="form-label text-dark fw-semibold small mb-1" style="font-size: 0.75rem;">Practitioner Status *</label>
+                            <select class="form-select border-secondary-subtle rounded-2 p-2.5 small" id="edit_is_active" name="is_active" required>
                                 <option value="1">Active</option>
                                 <option value="0">Inactive / On Leave</option>
                             </select>
@@ -225,7 +239,7 @@
                 </div>
                 <div class="modal-footer bg-light px-4 py-3 d-flex justify-content-end gap-2">
                     <button type="button" class="btn btn-light border rounded-2 fw-semibold px-3" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-dark rounded-2 fw-semibold px-4">Save Changes</button>
+                    <button type="submit" class="btn btn-primary rounded-2 fw-semibold px-4">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -260,21 +274,18 @@
                 const fee = this.getAttribute('data-fee');
                 const active = this.getAttribute('data-active');
 
-                // Bind original info to input variables
                 firstNameInput.value = firstName;
                 lastNameInput.value = lastName;
                 specializationInput.value = specialization;
                 feeInput.value = fee;
                 activeSelect.value = active;
                 
-                // Route update parameters mapping
                 editForm.setAttribute('action', `/owner/doctors/edit/${docId}`);
 
                 editModal.show();
             });
         });
 
-        // Form Validation script
         var forms = document.querySelectorAll('.needs-validation');
         Array.prototype.slice.call(forms).forEach(function (form) {
             form.addEventListener('submit', function (event) {

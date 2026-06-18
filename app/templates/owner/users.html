@@ -3,14 +3,13 @@
 {% block title %}User Management - CareSync{% endblock %}
 
 {% block content %}
-<div class="container py-2">
+<div class="container py-2 pt-0">
     <div class="row g-4">
         
-        <!-- Header Segment -->
         <div class="col-12">
             <div class="mb-3">
-                <a href="{{ url_for('owner.dashboard') }}" class="text-dark small text-decoration-none fw-semibold">
-                    <i class="fa-solid fa-arrow-left me-1"></i> Back to Clinic Roster
+                <a href="{{ url_for('owner.dashboard') }}" class="text-primary small text-decoration-none fw-semibold d-inline-flex align-items-center gap-1 transition-link">
+                    <i class="fa-solid fa-arrow-left fs-7"></i> Return to Administration Portal
                 </a>
             </div>
             <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between border-bottom pb-4 mb-2 gap-3">
@@ -19,77 +18,79 @@
                     <h2 class="h3 fw-bold text-dark mb-0">Manage User Access Accounts</h2>
                 </div>
                 <div>
-                    <span class="badge bg-dark rounded-pill px-3 py-2 fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">
-                        {{ users|length }} Active Accounts
+                    <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2 fw-semibold text-uppercase border border-primary-subtle" style="font-size: 0.725rem; letter-spacing: 0.05em;">
+                        <i class="fa-solid fa-users text-primary me-1 opacity-75"></i> {{ users|length }} Total Registered
                     </span>
                 </div>
             </div>
         </div>
 
-        <!-- MAIN TABLE GRID -->
         <div class="col-12">
             <div class="card border-0 shadow-sm rounded-3 bg-white overflow-hidden">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0" style="min-width: 800px;">
-                        <thead class="table-light">
+                        <thead class="table-light border-bottom border-light-subtle">
                             <tr>
-                                <th class="py-3 px-4 small text-uppercase text-secondary" style="font-size: 0.7rem; letter-spacing: 0.05em;">User Details</th>
-                                <th class="py-3 small text-uppercase text-secondary" style="font-size: 0.7rem; letter-spacing: 0.05em;">Username</th>
-                                <th class="py-3 small text-uppercase text-secondary" style="font-size: 0.7rem; letter-spacing: 0.05em;">Email</th>
-                                <th class="py-3 small text-uppercase text-secondary" style="font-size: 0.7rem; letter-spacing: 0.05em;">Role</th>
-                                <th class="py-3 small text-uppercase text-secondary" style="font-size: 0.7rem; letter-spacing: 0.05em;">Status</th>
-                                <th class="py-3 text-end px-4 small text-uppercase text-secondary" style="font-size: 0.7rem; letter-spacing: 0.05em;">Actions</th>
+                                <th class="py-3 px-4 small text-uppercase text-secondary fw-bold" style="font-size: 0.7rem; letter-spacing: 0.05em;">User Details</th>
+                                <th class="py-3 small text-uppercase text-secondary fw-bold" style="font-size: 0.7rem; letter-spacing: 0.05em;">Username</th>
+                                <th class="py-3 small text-uppercase text-secondary fw-bold" style="font-size: 0.7rem; letter-spacing: 0.05em;">Email</th>
+                                <th class="py-3 small text-uppercase text-secondary fw-bold" style="font-size: 0.7rem; letter-spacing: 0.05em;">Role</th>
+                                <th class="py-3 small text-uppercase text-secondary fw-bold" style="font-size: 0.7rem; letter-spacing: 0.05em;">Status</th>
+                                <th class="py-3 text-end px-4 small text-uppercase text-secondary fw-bold" style="font-size: 0.7rem; letter-spacing: 0.05em;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% if not users %}
                                 <tr>
-                                    <td colspan="6" class="text-center py-5">
-                                        <p class="text-muted small mb-0">No records found matching system directory queries.</p>
+                                    <td colspan="6" class="text-center py-5 bg-white">
+                                        <div class="text-muted mb-3">
+                                            <i class="fa-solid fa-users-slash display-4 opacity-50"></i>
+                                        </div>
+                                        <p class="text-secondary fw-medium mb-0">No records found matching system directory queries.</p>
                                     </td>
                                 </tr>
                             {% else %}
                                 {% for u in users %}
-                                    <tr class="border-bottom">
-                                        <td class="py-3 px-4">
-                                            <strong class="text-dark d-block fs-6">{{ u.first_name }} {{ u.last_name }}</strong>
-                                            <span class="text-muted" style="font-size: 0.7rem;">Registered: {{ u.created_at.strftime('%Y-%m-%d') if u.created_at else 'Unknown' }}</span>
+                                    <tr class="border-bottom border-light-subtle transition-row">
+                                        <td class="py-3.5 px-4">
+                                            <div class="border-start border-4 border-primary ps-3">
+                                                <strong class="text-dark d-block fs-6 fw-bold">{{ u.first_name }} {{ u.last_name }}</strong>
+                                                <span class="text-muted d-block mt-0.5" style="font-size: 0.7rem;">Registered: {{ u.created_at.strftime('%Y-%m-%d') if u.created_at else 'Unknown' }}</span>
+                                            </div>
                                         </td>
                                         <td>
-                                            <span class="font-monospace text-dark small">@{{ u.username }}</span>
+                                            <span class="font-monospace text-dark bg-light px-2 py-1 rounded small border border-light-subtle">@{{ u.username }}</span>
                                         </td>
                                         <td>
-                                            <span class="text-secondary small">{{ u.email }}</span>
+                                            <span class="text-secondary small fw-medium">{{ u.email }}</span>
                                         </td>
                                         <td>
-                                            <span class="badge border text-uppercase px-2.5 py-1.5 small fw-bold rounded-1
+                                            <span class="badge border text-uppercase px-3 py-1.5 fw-bold rounded-pill tracking-wider
                                                 {% if u.role == 'staff' %}bg-info-subtle text-info border-info-subtle
                                                 {% else %}bg-primary-subtle text-primary border-primary-subtle{% endif %}" style="font-size: 0.65rem;">
-                                                {{ u.role }}
+                                                <i class="fa-solid {% if u.role == 'staff' %}fa-user-tie{% else %}fa-user-shield{% endif %} me-1 opacity-75"></i> {{ u.role }}
                                             </span>
                                         </td>
                                         <td>
-                                            <span class="badge border text-uppercase px-2.5 py-1.5 small fw-bold rounded-1
-                                                {% if u.status == 'active' %}bg-success-subtle text-success border-success-subtle
+                                            <span class="badge border text-uppercase px-3 py-1.5 fw-bold rounded-pill tracking-wider
+                                                {% if u.status == 'active' %}bg-primary-subtle text-primary border-primary-subtle
                                                 {% elif u.status == 'suspended' %}bg-warning-subtle text-warning border-warning-subtle
                                                 {% else %}bg-danger-subtle text-danger border-danger-subtle{% endif %}" style="font-size: 0.65rem;">
-                                                {{ u.status }}
+                                                <i class="fa-solid fa-circle me-1 small opacity-75" style="font-size: 0.55rem;"></i> {{ u.status }}
                                             </span>
                                         </td>
                                         <td class="text-end px-4">
-                                            <div class="d-inline-flex gap-1.5">
-                                                <!-- Action Form: Change Status -->
+                                            <div class="d-inline-flex align-items-center gap-2">
                                                 <form action="{{ url_for('owner.update_user_status', target_id=u.id) }}" method="POST" class="m-0">
-                                                    <select class="form-select form-select-sm py-1 border-secondary-subtle rounded-1 small" name="status" onchange="this.form.submit()" style="font-size: 0.75rem; width: 110px;">
+                                                    <select class="form-select form-select-sm border-secondary-subtle rounded-2 small fw-medium px-2.5" name="status" onchange="this.form.submit()" style="font-size: 0.75rem; width: 130px; height: 32px; background-position: right 0.5rem center;">
                                                         <option value="" disabled selected>Update Access</option>
-                                                        <option value="active" {% if u.status == 'active' %}disabled{% endif %}>Activate</option>
-                                                        <option value="suspended" {% if u.status == 'suspended' %}disabled{% endif %}>Suspend</option>
-                                                        <option value="blocked" {% if u.status == 'blocked' %}disabled{% endif %}>Block</option>
+                                                        <option value="active" {% if u.status == 'active' %}disabled{% endif %}>Activate Account</option>
+                                                        <option value="suspended" {% if u.status == 'suspended' %}disabled{% endif %}>Suspend Access</option>
+                                                        <option value="blocked" {% if u.status == 'blocked' %}disabled{% endif %}>Block Account</option>
                                                     </select>
                                                 </form>
 
-                                                <!-- Action Trigger: Delete User Account -->
-                                                <button type="button" class="btn btn-outline-danger btn-sm rounded-1 px-2.5 py-1 btn-delete-trigger text-uppercase fw-semibold" style="font-size: 0.7rem;"
+                                                <button type="button" class="btn btn-outline-danger btn-sm rounded-2 px-3 fw-semibold btn-delete-trigger text-uppercase tracking-wider" style="font-size: 0.7rem; height: 32px;"
                                                         data-id="{{ u.id }}"
                                                         data-name="{{ u.first_name }} {{ u.last_name }}"
                                                         data-username="{{ u.username }}">
@@ -109,25 +110,28 @@
     </div>
 </div>
 
-<!-- DELETE USER MODAL -->
 <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
             <div class="modal-header border-bottom px-4 py-3">
                 <h5 class="modal-title fw-bold text-dark fs-6 text-uppercase tracking-wider" id="deleteUserModalLabel">
-                    <i class="fa-solid fa-triangle-exclamation text-danger me-2"></i>Confirm Permanency Deletion
+                    <i class="fa-solid fa-triangle-exclamation text-danger me-2"></i>Confirm Account Deletion
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
-                <p class="text-muted mb-3 small">Are you sure you want to permanently delete this user account from the CareSync portal databases? Please verify:</p>
+                <p class="text-secondary mb-3 small" style="line-height: 1.5;">Are you sure you want to permanently purge this user account from the CareSync portal records? Please verify target credentials:</p>
+                
                 <div class="bg-light p-3 rounded-2 border border-light-subtle mb-3">
-                    <span class="text-dark d-block small mb-1" id="modalTargetName"><strong>Name:</strong> ...</span>
-                    <span class="text-muted d-block small" id="modalTargetUsername"><strong>Username:</strong> ...</span>
+                    <span class="text-dark d-block small mb-1.5" id="modalTargetName"><strong>Name:</strong> ...</span>
+                    <span class="text-muted d-block small font-monospace" id="modalTargetUsername"><strong>Username:</strong> ...</span>
                 </div>
-                <div class="alert alert-danger border-0 rounded-2 p-2.5 m-0 d-flex align-items-center gap-2">
-                    <i class="fa-solid fa-circle-info small"></i>
-                    <span class="small fw-semibold" style="font-size: 0.75rem;">This operation cascades to all child consultations/billings and is irreversible!</span>
+                
+                <div class="alert alert-danger border-0 rounded-2 p-3 m-0 d-flex align-items-start gap-2.5">
+                    <i class="fa-solid fa-circle-info mt-0.5 fs-6 flex-shrink-0"></i>
+                    <div class="small fw-semibold" style="font-size: 0.75rem; line-height: 1.4;">
+                        Critical structural warning: This operation cascades recursively to all linked child logs, assignments, or records and cannot be reversed.
+                    </div>
                 </div>
             </div>
             <div class="modal-footer bg-light px-4 py-3 d-flex justify-content-end gap-2">
@@ -136,13 +140,20 @@
                 </button>
                 <form id="deleteUserForm" action="" method="POST" class="m-0">
                     <button type="submit" class="btn btn-danger rounded-2 fw-semibold px-4">
-                        Confirm Delete
+                        Confirm Permanent Delete
                     </button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .transition-row { transition: background-color 0.15s ease; }
+    .transition-row:hover { background-color: rgba(248, 249, 250, 0.65) !important; }
+    .transition-link { transition: transform 0.15s ease, color 0.15s ease; }
+    .transition-link:hover { transform: translateX(-2px); }
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -162,7 +173,7 @@
                 const username = this.getAttribute('data-username');
 
                 targetNameInput.innerHTML = `<strong>Name:</strong> ${name}`;
-                targetUsernameInput.innerHTML = `<strong>Username:</strong> @${username}`;
+                targetUsernameInput.innerHTML = `<strong>Username:</strong> <span class="bg-white px-1.5 py-0.5 rounded border text-dark">@${username}</span>`;
                 
                 deleteForm.setAttribute('action', `/owner/users/delete/${userId}`);
 
