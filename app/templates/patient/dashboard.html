@@ -102,7 +102,7 @@
                                 </div>
 
                                 {% if appt.symptoms_brief %}
-                                    <div class="mt-3 text-dark small bg-light p-3 rounded-2 border border-light-subtle" style="font-size: 0.75rem; line-height: 1.4;">
+                                    <div class="mt-3 text-dark bg-light p-3 rounded-2 border border-light-subtle" style="font-size: 0.75rem; line-height: 1.4;">
                                         <span class="text-uppercase text-muted d-block fw-bold mb-1" style="font-size: 0.65rem; letter-spacing: 0.05em;">Reason for Visit</span>
                                         {{ appt.symptoms_brief }}
                                     </div>
@@ -161,6 +161,13 @@
                                         {{ appt.status }}
                                     </span>
                                 </div>
+                                {% if appt.status == 'Cancelled' %}
+                                    <div class="mt-3">
+                                        <a href="{{ url_for('patient.book') }}" class="btn btn-primary rounded-2 fw-bold py-2 px-3 text-uppercase d-inline-flex align-items-center gap-2" style="font-size: 0.7rem; letter-spacing: 0.05em;">
+                                            <i class="fa-solid fa-arrows-rotate"></i> Reschedule
+                                        </a>
+                                    </div>
+                                {% endif %}
                                 {% if appt.medical_notes %}
                                     <div class="mt-3 p-3 bg-white rounded-2 border border-secondary-subtle">
                                         <span class="text-uppercase text-success d-block fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">

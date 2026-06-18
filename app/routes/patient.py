@@ -63,7 +63,7 @@ def dashboard():
         
         # Fetch past consultations (Completed, Cancelled)
         cursor.execute("""
-            SELECT a.id, a.appointment_date, a.appointment_time, a.status, a.medical_notes,
+            SELECT a.id, a.appointment_date, a.appointment_time, a.status, a.medical_notes, a.doctor_id,
                    d.first_name AS doc_first, d.last_name AS doc_last, d.specialization,
                    b.amount_due, b.payment_status
             FROM appointments a
@@ -168,7 +168,8 @@ def book():
 @login_required
 def cancel(appointment_id):
     """
-    Allows patients to securely cancel their own upcoming appointments.
+    Allows patients to securely and permanently delete their own upcoming appointments.
+    Deletes child billing records first to avoid foreign key failures.
     """
     connection = current_app.get_db_connection()
     try:
@@ -181,8 +182,10 @@ def cancel(appointment_id):
         elif appt['status'] in ('Completed', 'Cancelled'):
             flash('Completed or cancelled appointments cannot be modified.', 'warning')
         else:
-            cursor.execute("UPDATE appointments SET status = 'Cancelled' WHERE id = %s", (appointment_id,))
-            flash('Your appointment has been cancelled.', 'info')
+            # Completely delete billing and appointment logs to satisfy auto-delete logic
+            cursor.execute("DELETE FROM billing WHERE appointment_id = %s", (appointment_id,))
+            cursor.execute("DELETE FROM appointments WHERE id = %s AND patient_id = %s", (appointment_id, session['user_id']))
+            flash('Your appointment schedule reservation has been removed.', 'info')
             
         cursor.close()
     except Exception as e:
