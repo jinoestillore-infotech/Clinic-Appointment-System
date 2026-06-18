@@ -13,6 +13,7 @@ role ENUM('patient', 'staff', 'owner') NOT NULL DEFAULT 'patient',
 first_name VARCHAR(50) NOT NULL,
 last_name VARCHAR(50) NOT NULL,
 phone_number VARCHAR(15),
+status ENUM('active', 'suspended', 'blocked') NOT NULL DEFAULT 'active',
 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
