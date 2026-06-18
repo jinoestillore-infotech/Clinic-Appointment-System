@@ -71,7 +71,7 @@
                     <span class="text-uppercase text-secondary fw-bold mb-0" style="letter-spacing: 0.08em;">Upcoming Schedules</span>
                     <span class="badge bg-dark-subtle text-dark rounded-pill px-3 py-1.5 fw-semibold small">{{ upcoming|length }} Active</span>
                 </div>
-                <div class="card-body p-0 bg-light">
+                <div class="card-body p-0 bg-light" style="max-height: 500px; overflow-y: auto;">
                     {% if not upcoming %}
                         <div class="text-center py-5 px-3">
                             <div class="text-muted mb-3">

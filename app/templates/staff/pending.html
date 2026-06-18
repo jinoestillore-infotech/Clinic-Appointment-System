@@ -3,7 +3,7 @@
 {% block title %}Pending Approvals - CareSync{% endblock %}
 
 {% block content %}
-<div class="container py-2">
+<div class="container py-2 pt-0">
     <div class="row g-4">
         <!-- Header Segment -->
         <div class="col-12">
@@ -89,13 +89,15 @@
                                             </button>
                                         </form>
 
-                                        <!-- Decline Action Box -->
-                                        <form action="{{ url_for('staff.cancel', appointment_id=appt.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to decline this request?');" class="m-0">
-                                            <input type="hidden" name="redirect_to" value="pending">
-                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-2 fw-semibold px-3 py-2" style="font-size: 0.8rem;">
-                                                Decline
-                                            </button>
-                                        </form>
+                                        <!-- Decline Action Button (Triggers custom Bootstrap confirmation modal) -->
+                                        <button type="button" 
+                                                class="btn btn-outline-danger btn-sm rounded-2 fw-semibold px-3 py-2 btn-decline-trigger" 
+                                                style="font-size: 0.8rem;"
+                                                data-action-url="{{ url_for('staff.cancel', appointment_id=appt.id) }}"
+                                                data-patient-name="{{ appt.pat_first }} {{ appt.pat_last }}"
+                                                data-appointment-date="{{ appt.appointment_date }} @ {{ appt.appointment_time }}">
+                                            Decline
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -107,10 +109,73 @@
     </div>
 </div>
 
+<!-- Decline Confirmation Modal -->
+<div class="modal fade" id="declineConfirmationModal" tabindex="-1" aria-labelledby="declineConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-3">
+            <div class="modal-header border-bottom px-4 py-3">
+                <h5 class="modal-title fw-bold text-dark fs-6 text-uppercase tracking-wider" id="declineConfirmationModalLabel">
+                    <i class="fa-solid fa-triangle-exclamation text-danger me-2"></i>Confirm Decline
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <p class="text-muted mb-3 small">Are you sure you want to decline this patient appointment request? Please confirm the details below:</p>
+                <div class="bg-light p-3 rounded-2 border border-light-subtle mb-3">
+                    <span class="text-dark d-block small mb-1" id="modalDeclinePatientName"><strong>Patient:</strong> ...</span>
+                    <span class="text-muted d-block small" id="modalDeclineAppointmentDate"><strong>Schedule:</strong> ...</span>
+                </div>
+                <div class="alert alert-danger border-0 rounded-2 p-2.5 m-0 d-flex align-items-center gap-2">
+                    <i class="fa-solid fa-circle-info small"></i>
+                    <span class="small fw-semibold" style="font-size: 0.75rem;">This appointment request will be marked as cancelled.</span>
+                </div>
+            </div>
+            <div class="modal-footer bg-light px-4 py-3 d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-light border rounded-2 fw-semibold px-3" data-bs-dismiss="modal">
+                    Cancel Action
+                </button>
+                <form id="modalDeclineForm" action="" method="POST" class="m-0">
+                    <input type="hidden" name="redirect_to" value="pending">
+                    <button type="submit" class="btn btn-danger rounded-2 fw-semibold px-4">
+                        Confirm Decline
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Extra CSS layout helpers ensuring design aesthetics across screen targets -->
 <style>
     .border-dashed { border-style: dashed !important; }
     .btn-link { transition: color 0.15s ease-in-out; }
     .btn-link:hover { color: var(--bs-primary) !important; }
 </style>
+
+<!-- Modal Controller Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const declineTriggers = document.querySelectorAll('.btn-decline-trigger');
+        const modalForm = document.getElementById('modalDeclineForm');
+        const modalPatientText = document.getElementById('modalDeclinePatientName');
+        const modalDateText = document.getElementById('modalDeclineAppointmentDate');
+        
+        // Dynamic loading guard for loading modal safely in asynchronous environments
+        const confirmationModal = new bootstrap.Modal(document.getElementById('declineConfirmationModal'));
+
+        declineTriggers.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const targetActionUrl = this.getAttribute('data-action-url');
+                const patientName = this.getAttribute('data-patient-name');
+                const appointmentDate = this.getAttribute('data-appointment-date');
+
+                modalForm.setAttribute('action', targetActionUrl);
+                modalPatientText.innerHTML = `<strong>Patient:</strong> ${patientName}`;
+                modalDateText.innerHTML = `<strong>Schedule:</strong> ${appointmentDate}`;
+
+                confirmationModal.show();
+            });
+        });
+    });
+</script>
 {% endblock %}
