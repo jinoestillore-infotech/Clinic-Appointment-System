@@ -16,11 +16,26 @@ def staff_required(f):
     return decorated_function
 
 
+def auto_cancel_expired_appointments(cursor):
+    """
+    Database sweep helper: Automatically transitions unconfirmed pending appointments
+    to 'Cancelled' if their scheduled date and time are in the past.
+    """
+    cursor.execute("""
+        UPDATE appointments 
+        SET status = 'Cancelled' 
+        WHERE status = 'Pending' 
+          AND (appointment_date < CURDATE() 
+               OR (appointment_date = CURDATE() AND appointment_time < CURTIME()))
+    """)
+
+
 @staff_bp.route('/dashboard')
 @staff_required
 def dashboard():
     """
     Renders the clinician dashboard containing stats and active/past consultations.
+    Runs the auto-cancellation sweep beforehand.
     """
     connection = current_app.get_db_connection()
     appointments = []
@@ -28,6 +43,10 @@ def dashboard():
     
     try:
         cursor = connection.cursor(dictionary=True)
+        
+        # Run database sweep to cancel past-due pending appointments
+        auto_cancel_expired_appointments(cursor)
+        
         cursor.execute("SELECT id, specialization FROM doctors WHERE user_id = %s", (session['user_id'],))
         doctor = cursor.fetchone()
         
@@ -66,11 +85,16 @@ def dashboard():
 def pending():
     """
     Renders the isolated pending appointments queue for clinical staff.
+    Runs the auto-cancellation sweep beforehand.
     """
     connection = current_app.get_db_connection()
     appointments = []
     try:
         cursor = connection.cursor(dictionary=True)
+        
+        # Run database sweep to cancel past-due pending appointments
+        auto_cancel_expired_appointments(cursor)
+        
         cursor.execute("SELECT id FROM doctors WHERE user_id = %s", (session['user_id'],))
         doctor = cursor.fetchone()
         
@@ -113,7 +137,6 @@ def confirm(appointment_id):
     finally:
         connection.close()
         
-    # Support smart redirection back to pending queue if submitted from there
     if request.form.get('redirect_to') == 'pending':
         return redirect(url_for('staff.pending'))
     return redirect(url_for('staff.dashboard'))

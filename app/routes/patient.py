@@ -17,11 +17,26 @@ def login_required(f):
     return decorated_function
 
 
+def auto_cancel_expired_appointments(cursor):
+    """
+    Database sweep helper: Automatically transitions unconfirmed pending appointments
+    to 'Cancelled' if their scheduled date and time are in the past.
+    """
+    cursor.execute("""
+        UPDATE appointments 
+        SET status = 'Cancelled' 
+        WHERE status = 'Pending' 
+          AND (appointment_date < CURDATE() 
+               OR (appointment_date = CURDATE() AND appointment_time < CURTIME()))
+    """)
+
+
 @patient_bp.route('/dashboard')
 @login_required
 def dashboard():
     """
     Fetches and displays active and past appointments with their corresponding billing information.
+    Runs the auto-cancellation sweep beforehand.
     """
     connection = current_app.get_db_connection()
     upcoming_appointments = []
@@ -30,7 +45,10 @@ def dashboard():
     try:
         cursor = connection.cursor(dictionary=True)
         
-        # 1. Fetch upcoming appointments (Pending, Confirmed) with Doctor and Billing info
+        # Run database sweep to cancel past-due pending appointments
+        auto_cancel_expired_appointments(cursor)
+        
+        # Fetch upcoming appointments (Pending, Confirmed)
         cursor.execute("""
             SELECT a.id, a.appointment_date, a.appointment_time, a.status, a.symptoms_brief,
                    d.first_name AS doc_first, d.last_name AS doc_last, d.specialization,
@@ -43,7 +61,7 @@ def dashboard():
         """, (session['user_id'],))
         upcoming_appointments = cursor.fetchall()
         
-        # 2. Fetch past consultations (Completed, Cancelled)
+        # Fetch past consultations (Completed, Cancelled)
         cursor.execute("""
             SELECT a.id, a.appointment_date, a.appointment_time, a.status, a.medical_notes,
                    d.first_name AS doc_first, d.last_name AS doc_last, d.specialization,
@@ -75,9 +93,12 @@ def book():
     connection = current_app.get_db_connection()
     doctors = []
     
-    # Pre-fetch all active doctors to populate the dropdown selection input
     try:
         cursor = connection.cursor(dictionary=True)
+        
+        # Clean up database on load
+        auto_cancel_expired_appointments(cursor)
+        
         cursor.execute("SELECT id, first_name, last_name, specialization, consultation_fee FROM doctors WHERE is_active = 1")
         doctors = cursor.fetchall()
         cursor.close()
@@ -98,7 +119,7 @@ def book():
         try:
             cursor = connection.cursor(dictionary=True)
             
-            # Double-booking guardrail: check if doctor has another active appointment at the exact time
+            # Double-booking guardrail
             cursor.execute("""
                 SELECT id FROM appointments 
                 WHERE doctor_id = %s AND appointment_date = %s AND appointment_time = %s AND status != 'Cancelled'
@@ -118,12 +139,11 @@ def book():
             """, (session['user_id'], doctor_id, date_str, time_str, symptoms))
             appointment_id = cursor.lastrowid
             
-            # Fetch doctor's consultation fee to create the initial payment/billing record
             cursor.execute("SELECT consultation_fee FROM doctors WHERE id = %s", (doctor_id,))
             doctor_info = cursor.fetchone()
             fee = doctor_info['consultation_fee'] if doctor_info else 500.00
             
-            # Insert billing entry with the default 'Unpaid' state
+            # Insert billing entry
             cursor.execute("""
                 INSERT INTO billing (appointment_id, amount_due, payment_status)
                 VALUES (%s, %s, 'Unpaid')
@@ -138,7 +158,6 @@ def book():
         finally:
             connection.close()
             
-    # Close connection gracefully if request is GET
     if connection.is_connected():
         connection.close()
         
@@ -154,8 +173,6 @@ def cancel(appointment_id):
     connection = current_app.get_db_connection()
     try:
         cursor = connection.cursor(dictionary=True)
-        
-        # Verify appointment exists and belongs to the logged-in patient
         cursor.execute("SELECT status FROM appointments WHERE id = %s AND patient_id = %s", (appointment_id, session['user_id']))
         appt = cursor.fetchone()
         
@@ -164,7 +181,6 @@ def cancel(appointment_id):
         elif appt['status'] in ('Completed', 'Cancelled'):
             flash('Completed or cancelled appointments cannot be modified.', 'warning')
         else:
-            # Safely set status to 'Cancelled'
             cursor.execute("UPDATE appointments SET status = 'Cancelled' WHERE id = %s", (appointment_id,))
             flash('Your appointment has been cancelled.', 'info')
             
