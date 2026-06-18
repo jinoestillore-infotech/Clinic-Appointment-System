@@ -93,9 +93,10 @@ def book():
     connection = current_app.get_db_connection()
     doctors = []
     
-    # Capture optional prefill inputs from URL query parameters (for rescheduled appointments)
+    # Capture optional prefill inputs and original reschedule ID from URL query parameters
     preset_doctor_id = request.args.get('doctor_id', type=int)
     preset_symptoms = request.args.get('symptoms', '')
+    reschedule_id = request.args.get('reschedule_id', type=int)
     
     try:
         cursor = connection.cursor(dictionary=True)
@@ -118,7 +119,7 @@ def book():
         if not doctor_id or not date_str or not time_str:
             flash('Please complete all required schedule selections.', 'warning')
             connection.close()
-            return render_template('patient/book.html', doctors=doctors, preset_doctor_id=preset_doctor_id, preset_symptoms=preset_symptoms)
+            return render_template('patient/book.html', doctors=doctors, preset_doctor_id=preset_doctor_id, preset_symptoms=preset_symptoms, reschedule_id=reschedule_id)
             
         try:
             cursor = connection.cursor(dictionary=True)
@@ -134,27 +135,44 @@ def book():
                 flash('The selected time slot has already been reserved. Please choose a different hour.', 'warning')
                 cursor.close()
                 connection.close()
-                return render_template('patient/book.html', doctors=doctors, preset_doctor_id=preset_doctor_id, preset_symptoms=preset_symptoms)
-            
-            # Insert the appointment record
-            cursor.execute("""
-                INSERT INTO appointments (patient_id, doctor_id, appointment_date, appointment_time, status, symptoms_brief)
-                VALUES (%s, %s, %s, %s, 'Pending', %s)
-            """, (session['user_id'], doctor_id, date_str, time_str, symptoms))
-            appointment_id = cursor.lastrowid
+                return render_template('patient/book.html', doctors=doctors, preset_doctor_id=preset_doctor_id, preset_symptoms=preset_symptoms, reschedule_id=reschedule_id)
             
             cursor.execute("SELECT consultation_fee FROM doctors WHERE id = %s", (doctor_id,))
             doctor_info = cursor.fetchone()
             fee = doctor_info['consultation_fee'] if doctor_info else 500.00
-            
-            # Insert billing entry
-            cursor.execute("""
-                INSERT INTO billing (appointment_id, amount_due, payment_status)
-                VALUES (%s, %s, 'Unpaid')
-            """, (appointment_id, fee))
+
+            # OVERWRITE MECHANIC: If we are rescheduling a cancelled row, update it directly
+            if reschedule_id:
+                cursor.execute("""
+                    UPDATE appointments 
+                    SET doctor_id = %s, appointment_date = %s, appointment_time = %s, status = 'Pending', symptoms_brief = %s, medical_notes = NULL
+                    WHERE id = %s AND patient_id = %s
+                """, (doctor_id, date_str, time_str, symptoms, reschedule_id, session['user_id']))
+                
+                cursor.execute("""
+                    UPDATE billing 
+                    SET amount_due = %s, payment_status = 'Unpaid', payment_method = NULL, paid_at = NULL
+                    WHERE appointment_id = %s
+                """, (fee, reschedule_id))
+                
+                flash('Your appointment schedule has been successfully updated!', 'success')
+            else:
+                # Insert the appointment record (Standard normal booking)
+                cursor.execute("""
+                    INSERT INTO appointments (patient_id, doctor_id, appointment_date, appointment_time, status, symptoms_brief)
+                    VALUES (%s, %s, %s, %s, 'Pending', %s)
+                """, (session['user_id'], doctor_id, date_str, time_str, symptoms))
+                appointment_id = cursor.lastrowid
+                
+                # Insert billing entry
+                cursor.execute("""
+                    INSERT INTO billing (appointment_id, amount_due, payment_status)
+                    VALUES (%s, %s, 'Unpaid')
+                """, (appointment_id, fee))
+                
+                flash('Your appointment schedule request has been submitted!', 'success')
             
             cursor.close()
-            flash('Your appointment schedule request has been submitted!', 'success')
             return redirect(url_for('patient.dashboard'))
             
         except Exception as e:
@@ -165,7 +183,7 @@ def book():
     if connection.is_connected():
         connection.close()
         
-    return render_template('patient/book.html', doctors=doctors, preset_doctor_id=preset_doctor_id, preset_symptoms=preset_symptoms)
+    return render_template('patient/book.html', doctors=doctors, preset_doctor_id=preset_doctor_id, preset_symptoms=preset_symptoms, reschedule_id=reschedule_id)
 
 
 @patient_bp.route('/cancel/<int:appointment_id>', methods=['POST'])

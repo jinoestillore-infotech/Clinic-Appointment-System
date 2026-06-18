@@ -7,28 +7,25 @@
     <div class="row justify-content-center">
         <div class="col-12 col-md-10 col-lg-6">
             
-            <!-- Navigation Breadcrumb link -->
             <div class="mb-4">
                 <a href="{{ url_for('patient.dashboard') }}" class="text-primary small fw-semibold text-decoration-none d-inline-flex align-items-center gap-1">
                     <i class="fa-solid fa-arrow-left small"></i> Back to Dashboard
                 </a>
             </div>
 
-            <!-- Booking Form Card -->
             <div class="card border-0 shadow-sm rounded-3 bg-white overflow-hidden">
                 <div class="card-header border-0 bg-transparent pt-4 pb-2 px-4 text-center">
                     <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 48px; height: 48px;">
                         <i class="fa-solid fa-calendar-check fs-5"></i>
                     </div>
-                    <h3 class="fw-bold text-dark h4 mb-1">Book Appointment</h3>
+                    <h3 class="fw-bold text-dark h4 mb-1">{% if reschedule_id %}Reschedule Appointment{% else %}Book Appointment{% endif %}</h3>
                     <p class="text-muted small mb-0">Select your preferences below to reserve a timeslot</p>
                 </div>
                 
                 <div class="card-body p-4 pt-3">
-                    <form action="{{ url_for('patient.book', doctor_id=preset_doctor_id, symptoms=preset_symptoms) }}" method="POST" class="needs-validation" novalidate>
+                    <form action="{{ url_for('patient.book', doctor_id=preset_doctor_id, symptoms=preset_symptoms, reschedule_id=reschedule_id) }}" method="POST" class="needs-validation" novalidate>
                         
                         <div class="row g-3">
-                            <!-- Select Doctor / Specialist -->
                             <div class="col-12">
                                 <label for="doctor_id" class="form-label text-dark fw-semibold mb-1" style="font-size: 0.75rem; letter-spacing: 0.02em;">
                                     Specialist / Consultant <span class="text-danger">*</span>
@@ -44,7 +41,6 @@
                                 <div class="invalid-feedback">Please choose a doctor.</div>
                             </div>
 
-                            <!-- Date Selection -->
                             <div class="col-12">
                                 <label for="appointment_date" class="form-label text-dark fw-semibold mb-1" style="font-size: 0.75rem; letter-spacing: 0.02em;">
                                     Select Date <span class="text-danger">*</span>
@@ -53,7 +49,6 @@
                                 <div class="invalid-feedback">Please choose a valid date.</div>
                             </div>
 
-                            <!-- Time Selection -->
                             <div class="col-12">
                                 <label for="appointment_time" class="form-label text-dark fw-semibold mb-1" style="font-size: 0.75rem; letter-spacing: 0.02em;">
                                     Select Time Slot <span class="text-danger">*</span>
@@ -71,7 +66,6 @@
                                 <div class="invalid-feedback">Please choose a time slot.</div>
                             </div>
 
-                            <!-- Short Symptoms brief description input -->
                             <div class="col-12 mb-2">
                                 <label for="symptoms" class="form-label text-dark fw-semibold mb-1" style="font-size: 0.75rem; letter-spacing: 0.02em;">
                                     Brief Reason for Visit <span class="text-muted fw-normal">(Optional)</span>
@@ -80,10 +74,9 @@
                             </div>
                         </div>
 
-                        <!-- Booking submission -->
                         <div class="pt-2">
                             <button class="btn btn-primary rounded-2 fw-bold py-2.5 text-uppercase w-100 shadow-sm d-flex align-items-center justify-content-center gap-2" type="submit" style="font-size: 0.75rem; letter-spacing: 0.05em;">
-                                Secure Appointment <i class="fa-solid fa-check small"></i>
+                                {% if reschedule_id %}Confirm Reschedule{% else %}Secure Appointment{% endif %} <i class="fa-solid fa-check small"></i>
                             </button>
                         </div>
                     </form>
