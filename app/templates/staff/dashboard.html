@@ -6,7 +6,6 @@
 <div class="container py-2">
     <div class="row g-4">
         
-        <!-- Header Segment -->
         <div class="col-12">
             <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between border-bottom pb-4 mb-2 gap-3">
                 <div>
@@ -21,11 +20,10 @@
             </div>
         </div>
 
-        <!-- Metrics Overview Grid Row -->
         <div class="col-12">
             <div class="row g-3">
                 <div class="col-6 col-lg-3">
-                    <div class="card h-100 border-0 shadow-sm rounded-3">
+                    <div class="card h-100 border-start border-secondary border-4 shadow-sm rounded-3">
                         <div class="card-body p-3 p-sm-4 d-flex align-items-center justify-content-between">
                             <div>
                                 <span class="text-muted d-block fw-semibold text-uppercase small mb-1" style="letter-spacing: 0.05em;">Total Queue</span>
@@ -62,24 +60,31 @@
                 </div>
 
                 <div class="col-6 col-lg-3">
-                    <div class="card h-100 border-0 shadow-sm rounded-3">
-                        <div class="card-body p-3 p-sm-4 d-flex align-items-center justify-content-between">
-                            <div>
-                                <span class="text-muted d-block fw-semibold text-uppercase small mb-1" style="letter-spacing: 0.05em;">Confirmed</span>
-                                <h3 class="text-primary fw-bold mb-0 display-6">{{ stats.Confirmed }}</h3>
-                            </div>
-                            <div class="bg-primary-subtle text-primary rounded-3 p-3 d-none d-sm-block">
-                                <i class="fa-solid fa-calendar-check fs-4"></i>
+                    <a href="{{ url_for('staff.records') }}" class="text-decoration-none h-100 d-block card-hover">
+                        <div class="card h-100 border-start border-primary border-4 shadow-sm rounded-3 bg-white">
+                            <div class="card-body p-3 p-sm-4 d-flex align-items-center justify-content-between">
+                                <div>
+                                    <span class="text-primary d-block fw-semibold text-uppercase small mb-1" style="letter-spacing: 0.05em;">Confirmed</span>
+                                    <h3 class="text-primary fw-bold mb-0 display-6">{{ stats.Confirmed }}</h3>
+                                </div>
+                                <div class="bg-primary-subtle text-primary rounded-3 p-3 d-none d-sm-block">
+                                    <i class="fa-solid fa-calendar-check fs-4"></i>
+                                </div>
+                                {% if stats.Confirmed > 0 %}
+                                    <span class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-2 border-white rounded-circle animate-pulse">
+                                        <span class="visually-hidden">New alerts</span>
+                                    </span>
+                                {% endif %}
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
 
                 <div class="col-6 col-lg-3">
-                    <div class="card h-100 border-0 shadow-sm rounded-3">
+                    <div class="card h-100 border-start border-success border-4 shadow-sm rounded-3 bg-white">
                         <div class="card-body p-3 p-sm-4 d-flex align-items-center justify-content-between">
                             <div>
-                                <span class="text-muted d-block fw-semibold text-uppercase small mb-1" style="letter-spacing: 0.05em;">Completed</span>
+                                <span class="text-success d-block fw-semibold text-uppercase small mb-1" style="letter-spacing: 0.05em;">Completed</span>
                                 <h3 class="text-success fw-bold mb-0 display-6">{{ stats.Completed }}</h3>
                             </div>
                             <div class="bg-success-subtle text-success rounded-3 p-3 d-none d-sm-block">
@@ -91,7 +96,6 @@
             </div>
         </div>
 
-        <!-- Dynamic Dismissable Call-To-Action Banner -->
         {% if stats.Pending > 0 %}
             <div class="col-12 mt-3">
                 <div class="card bg-warning-subtle border-0 rounded-3 shadow-sm">
@@ -113,7 +117,6 @@
             </div>
         {% endif %}
 
-        <!-- Interactive Launchpad Deck (Replacing Old List Module) -->
         <div class="col-12 mt-4">
             <div class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-3">
                 <h3 class="h6 text-uppercase fw-bold text-secondary mb-0" style="letter-spacing: 0.08em;">Schedules & Queue Management</h3>
@@ -121,7 +124,6 @@
             </div>
             
             <div class="row g-3">
-                <!-- Launchpad Box 1: Pending Action Queue Route -->
                 <div class="col-12 col-md-6">
                     <a href="{{ url_for('staff.pending') }}" class="text-decoration-none text-dark d-block h-100 card-hover">
                         <div class="card border-0 shadow-sm rounded-3 p-4 bg-white h-100 position-relative overflow-hidden group">
@@ -142,9 +144,7 @@
                     </a>
                 </div>
 
-                <!-- Launchpad Box 2: Active Consultations/History Route -->
                 <div class="col-12 col-md-6">
-                    <!-- Note: Updated path pointer from # to url_for('staff.records') -->
                     <a href="{{ url_for('staff.records') }}" class="text-decoration-none text-dark d-block h-100 card-hover">
                         <div class="card border-0 shadow-sm rounded-3 p-4 bg-white h-100 position-relative overflow-hidden">
                             <div class="d-flex align-items-center justify-content-between mb-3">
@@ -169,7 +169,6 @@
     </div>
 </div>
 
-<!-- Modal Construction Layer (Retained for application architecture support) -->
 <div class="modal fade" id="completeConsultationModal" tabindex="-1" aria-labelledby="completeConsultationLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-3">
@@ -224,8 +223,6 @@
                 modalForm.setAttribute('action', targetActionUrl);
                 modalPatientText.innerText = patientName;
 
-                // Safe dynamic initialization check to prevent "ReferenceError: bootstrap is not defined" 
-                // in case the script block executes before the external Bootstrap JS bundle is fully ready.
                 if (typeof bootstrap !== 'undefined') {
                     const modalEl = document.getElementById('completeConsultationModal');
                     let completionModal = bootstrap.Modal.getInstance(modalEl);
