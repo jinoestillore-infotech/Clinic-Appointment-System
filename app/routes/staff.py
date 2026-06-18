@@ -80,6 +80,62 @@ def dashboard():
     return render_template('staff/dashboard.html', appointments=appointments, stats=stats)
 
 
+@staff_bp.route('/records')
+@staff_required
+def records():
+    """
+    Renders the clinical records and session management vaults page.
+    Filters consultations into active (Confirmed) and history categories.
+    """
+    connection = current_app.get_db_connection()
+    active_consultations = []
+    past_consultations = []
+    
+    try:
+        cursor = connection.cursor(dictionary=True)
+        auto_cancel_expired_appointments(cursor)
+        
+        cursor.execute("SELECT id FROM doctors WHERE user_id = %s", (session['user_id'],))
+        doctor = cursor.fetchone()
+        
+        if doctor:
+            doctor_id = doctor['id']
+            
+            # Fetch active (Confirmed) appointments
+            cursor.execute("""
+                SELECT a.id, a.appointment_date, a.appointment_time, a.status, a.symptoms_brief,
+                       u.first_name AS pat_first, u.last_name AS pat_last, u.phone_number,
+                       b.amount_due, b.payment_status
+                FROM appointments a
+                JOIN users u ON a.patient_id = u.id
+                LEFT JOIN billing b ON a.id = b.appointment_id
+                WHERE a.doctor_id = %s AND a.status = 'Confirmed'
+                ORDER BY a.appointment_date ASC, a.appointment_time ASC
+            """, (doctor_id,))
+            active_consultations = cursor.fetchall()
+            
+            # Fetch archived (Completed, Cancelled) records
+            cursor.execute("""
+                SELECT a.id, a.appointment_date, a.appointment_time, a.status, a.symptoms_brief, a.medical_notes,
+                       u.first_name AS pat_first, u.last_name AS pat_last, u.phone_number,
+                       b.amount_due, b.payment_status
+                FROM appointments a
+                JOIN users u ON a.patient_id = u.id
+                LEFT JOIN billing b ON a.id = b.appointment_id
+                WHERE a.doctor_id = %s AND a.status IN ('Completed', 'Cancelled')
+                ORDER BY a.appointment_date DESC, a.appointment_time DESC
+            """, (doctor_id,))
+            past_consultations = cursor.fetchall()
+            
+        cursor.close()
+    except Exception as e:
+        flash(f'Failed to load record lists: {str(e)}', 'danger')
+    finally:
+        connection.close()
+        
+    return render_template('staff/records.html', active=active_consultations, past=past_consultations)
+
+
 @staff_bp.route('/pending')
 @staff_required
 def pending():

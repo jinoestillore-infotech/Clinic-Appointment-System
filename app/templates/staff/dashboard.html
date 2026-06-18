@@ -144,8 +144,8 @@
 
                 <!-- Launchpad Box 2: Active Consultations/History Route -->
                 <div class="col-12 col-md-6">
-                    <!-- Note: Change this path pointer below if your active sessions reside on an alternative route -->
-                    <a href="#" class="text-decoration-none text-dark d-block h-100 card-hover">
+                    <!-- Note: Updated path pointer from # to url_for('staff.records') -->
+                    <a href="{{ url_for('staff.records') }}" class="text-decoration-none text-dark d-block h-100 card-hover">
                         <div class="card border-0 shadow-sm rounded-3 p-4 bg-white h-100 position-relative overflow-hidden">
                             <div class="d-flex align-items-center justify-content-between mb-3">
                                 <div class="bg-primary-subtle text-primary rounded-3 p-3">

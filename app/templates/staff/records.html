@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block title %}Records Vault - CareSync{% endblock %}
+
+{% block content %}
+<div class="container py-2">
+    <div class="row g-4">
+        
+        <!-- Header Segment -->
+        <div class="col-12">
+            <div class="mb-3">
+                <a href="{{ url_for('staff.dashboard') }}" class="text-dark small text-decoration-none fw-semibold">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Back to Dashboard
+                </a>
+            </div>
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between border-bottom pb-4 mb-2 gap-3">
+                <div>
+                    <span class="text-uppercase text-primary fw-bold d-block mb-1" style="font-size: 0.75rem; letter-spacing: 0.12em;">Clinician Portal</span>
+                    <h2 class="h3 fw-bold text-dark mb-0">Active Consultations & Records</h2>
+                </div>
+                <div>
+                    <span class="badge bg-dark-subtle text-dark border border-dark-subtle rounded-pill px-3 py-2 fw-semibold text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                        <i class="fa-solid fa-folder-open me-1"></i> Medical History
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Left Column: Ongoing & Confirmed Sessions -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-3 bg-white h-100 overflow-hidden">
+                <div class="card-header bg-transparent border-bottom border-light py-3 d-flex align-items-center justify-content-between">
+                    <span class="text-uppercase text-secondary fw-bold small" style="letter-spacing: 0.08em;">
+                        <i class="fa-solid fa-clock-rotate-left me-1 text-primary"></i> Ongoing Clinic Queue
+                    </span>
+                    <span class="badge bg-primary text-white rounded-pill px-2.5 py-1 fw-semibold small">{{ active|length }} Active</span>
+                </div>
+                <div class="card-body p-3">
+                    {% if not active %}
+                        <div class="text-center py-5">
+                            <i class="fa-solid fa-calendar-check text-muted mb-2 display-6 opacity-50"></i>
+                            <p class="text-muted small mb-0">No ongoing confirmed consultations scheduled right now.</p>
+                        </div>
+                    {% else %}
+                        {% for appt in active %}
+                            <div class="p-3 border rounded-3 mb-3 bg-light-subtle position-relative">
+                                <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                                    <div>
+                                        <h5 class="fw-bold text-dark mb-1 fs-6">Patient: {{ appt.pat_first }} {{ appt.pat_last }}</h5>
+                                        <span class="text-muted small d-block mb-1">
+                                            <i class="fa-regular fa-clock me-1"></i> {{ appt.appointment_date }} @ {{ appt.appointment_time }}
+                                        </span>
+                                        <span class="text-secondary small d-block">
+                                            Contact: {{ appt.phone_number or 'Not provided' }}
+                                        </span>
+                                    </div>
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2.5 py-1 small fw-bold text-uppercase" style="font-size: 0.65rem;">
+                                        {{ appt.status }}
+                                    </span>
+                                </div>
+                                {% if appt.symptoms_brief %}
+                                    <div class="my-3 text-dark bg-white p-3 rounded-2 border border-light-subtle small" style="font-size: 0.75rem; line-height: 1.4;">
+                                        <span class="text-uppercase text-muted d-block fw-bold mb-1" style="font-size: 0.65rem; letter-spacing: 0.05em;">Reason for Visit</span>
+                                        {{ appt.symptoms_brief }}
+                                    </div>
+                                {% endif %}
+                                <div class="d-flex align-items-center justify-content-between pt-2 border-top border-light-subtle">
+                                    <span class="text-muted small">Fee: <strong>₱{{ "%.2f"|format(appt.amount_due) }}</strong></span>
+                                    <button type="button" 
+                                            class="btn btn-primary btn-sm rounded-2 btn-complete-trigger px-3" 
+                                            data-action-url="{{ url_for('staff.complete', appointment_id=appt.id) }}"
+                                            data-patient-name="{{ appt.pat_first }} {{ appt.pat_last }}">
+                                        Checkout & Complete
+                                    </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Archived Logs & Medical Histories -->
+        <div class="col-12 col-lg-6">
+            <div class="card border-0 shadow-sm rounded-3 bg-white h-100 overflow-hidden">
+                <div class="card-header bg-transparent border-bottom border-light py-3">
+                    <span class="text-uppercase text-secondary fw-bold small" style="letter-spacing: 0.08em;">
+                        <i class="fa-solid fa-receipt me-1 text-success"></i> Completed Histories
+                    </span>
+                </div>
+                <div class="card-body p-3">
+                    {% if not past %}
+                        <div class="text-center py-5">
+                            <i class="fa-solid fa-box-archive text-muted mb-2 display-6 opacity-50"></i>
+                            <p class="text-muted small mb-0">No historical archived records found in your folder.</p>
+                        </div>
+                    {% else %}
+                        {% for appt in past %}
+                            <div class="p-3 border-bottom border-light-subtle mb-2 pb-3">
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <div>
+                                        <h5 class="fw-bold text-dark mb-1 fs-6">Patient: {{ appt.pat_first }} {{ appt.pat_last }}</h5>
+                                        <span class="text-muted small d-block mb-1">
+                                            <i class="fa-regular fa-calendar-check me-1"></i> Consulted on {{ appt.appointment_date }}
+                                        </span>
+                                    </div>
+                                    <span class="badge rounded-pill px-2.5 py-1 small fw-bold text-uppercase border
+                                        {% if appt.status == 'Completed' %}bg-success-subtle text-success border-success-subtle{% else %}bg-secondary-subtle text-secondary border-secondary-subtle{% endif %}" style="font-size: 0.65rem;">
+                                        {{ appt.status }}
+                                    </span>
+                                </div>
+                                {% if appt.medical_notes %}
+                                    <div class="mt-2 p-3 bg-light rounded-2 border border-light-subtle small">
+                                        <span class="text-uppercase text-success d-block fw-bold mb-1" style="font-size: 0.65rem; letter-spacing: 0.05em;">
+                                            <i class="fa-solid fa-notes-medical me-1"></i> Consultation Notes
+                                        </span>
+                                        <p class="text-secondary small mb-0 lh-base">{{ appt.medical_notes }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Complete Checkout Consultation Modal -->
+<div class="modal fade" id="completeConsultationModal" tabindex="-1" aria-labelledby="completeConsultationLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-3">
+            <form id="modalCompleteForm" action="" method="POST" class="needs-validation m-0" novalidate>
+                <div class="modal-header border-bottom px-4 py-3">
+                    <h5 class="modal-title fw-bold text-dark fs-6 text-uppercase tracking-wider" id="completeConsultationLabel">
+                        <i class="fa-solid fa-file-invoice-dollar me-2 text-primary"></i>Consultation Summary
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-muted mb-3 small">Please enter treatment remarks or prescription instructions below to finalize checkout for <strong id="modalPatientName" class="text-dark">...</strong></p>
+                    <div class="mb-1">
+                        <label for="medical_notes" class="form-label text-dark fw-semibold small mb-1">Treatment Notes / Prescription *</label>
+                        <textarea class="form-control border-secondary-subtle rounded-2 p-2.5 small" id="medical_notes" name="medical_notes" rows="4" placeholder="Enter findings, prescriptions, or post-appointment guidance details..." required></textarea>
+                        <div class="invalid-feedback">Please enter clinical notes before finalizing.</div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light px-4 py-3 d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-light border rounded-2 fw-semibold px-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success rounded-2 fw-semibold px-4">Finalize & Bill</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Trigger Event Handlers script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const completeTriggers = document.querySelectorAll('.btn-complete-trigger');
+        const modalForm = document.getElementById('modalCompleteForm');
+        const modalPatientText = document.getElementById('modalPatientName');
+
+        completeTriggers.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const targetActionUrl = this.getAttribute('data-action-url');
+                const patientName = this.getAttribute('data-patient-name');
+                
+                modalForm.setAttribute('action', targetActionUrl);
+                modalPatientText.innerText = patientName;
+
+                if (typeof bootstrap !== 'undefined') {
+                    const modalEl = document.getElementById('completeConsultationModal');
+                    let completionModal = bootstrap.Modal.getInstance(modalEl);
+                    if (!completionModal) {
+                        completionModal = new bootstrap.Modal(modalEl);
+                    }
+                    completionModal.show();
+                } else {
+                    console.error('Bootstrap JS bundle is not loaded yet.');
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
