@@ -80,7 +80,7 @@
             </div>
         </div>
 
-        <!-- Right Column: Archived Logs & Medical Histories -->
+        <!-- Right Column: Archived Logs & Medical Histories (Cleanly filtered for completed visits only) -->
         <div class="col-12 col-lg-6">
             <div class="card border-0 shadow-sm rounded-3 bg-white h-100 overflow-hidden">
                 <div class="card-header bg-transparent border-bottom border-light py-3">
@@ -89,35 +89,45 @@
                     </span>
                 </div>
                 <div class="card-body p-3">
-                    {% if not past %}
+                    <!-- Dynamic check to count only completed appointments in the past dataset -->
+                    {% set completed_count = namespace(value=0) %}
+                    {% for appt in past %}
+                        {% if appt.status == 'Completed' %}
+                            {% set completed_count.value = completed_count.value + 1 %}
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if completed_count.value == 0 %}
                         <div class="text-center py-5">
                             <i class="fa-solid fa-box-archive text-muted mb-2 display-6 opacity-50"></i>
                             <p class="text-muted small mb-0">No historical archived records found in your folder.</p>
                         </div>
                     {% else %}
                         {% for appt in past %}
-                            <div class="p-3 border-bottom border-light-subtle mb-2 pb-3">
-                                <div class="d-flex justify-content-between align-items-start gap-2">
-                                    <div>
-                                        <h5 class="fw-bold text-dark mb-1 fs-6">Patient: {{ appt.pat_first }} {{ appt.pat_last }}</h5>
-                                        <span class="text-muted small d-block mb-1">
-                                            <i class="fa-regular fa-calendar-check me-1"></i> Consulted on {{ appt.appointment_date }}
+                            <!-- MODIFIED: Explicit filter to exclude cancelled, declined, or past unconfirmed records -->
+                            {% if appt.status == 'Completed' %}
+                                <div class="p-3 border-bottom border-light-subtle mb-2 pb-3">
+                                    <div class="d-flex justify-content-between align-items-start gap-2">
+                                        <div>
+                                            <h5 class="fw-bold text-dark mb-1 fs-6">Patient: {{ appt.pat_first }} {{ appt.pat_last }}</h5>
+                                            <span class="text-muted small d-block mb-1">
+                                                <i class="fa-regular fa-calendar-check me-1"></i> Consulted on {{ appt.appointment_date }}
+                                            </span>
+                                        </div>
+                                        <span class="badge rounded-pill px-2.5 py-1 small fw-bold text-uppercase border bg-success-subtle text-success border-success-subtle" style="font-size: 0.65rem;">
+                                            {{ appt.status }}
                                         </span>
                                     </div>
-                                    <span class="badge rounded-pill px-2.5 py-1 small fw-bold text-uppercase border
-                                        {% if appt.status == 'Completed' %}bg-success-subtle text-success border-success-subtle{% else %}bg-secondary-subtle text-secondary border-secondary-subtle{% endif %}" style="font-size: 0.65rem;">
-                                        {{ appt.status }}
-                                    </span>
+                                    {% if appt.medical_notes %}
+                                        <div class="mt-2 p-3 bg-light rounded-2 border border-light-subtle small">
+                                            <span class="text-uppercase text-success d-block fw-bold mb-1" style="font-size: 0.65rem; letter-spacing: 0.05em;">
+                                                <i class="fa-solid fa-notes-medical me-1"></i> Consultation Notes
+                                            </span>
+                                            <p class="text-secondary small mb-0 lh-base">{{ appt.medical_notes }}</p>
+                                        </div>
+                                    {% endif %}
                                 </div>
-                                {% if appt.medical_notes %}
-                                    <div class="mt-2 p-3 bg-light rounded-2 border border-light-subtle small">
-                                        <span class="text-uppercase text-success d-block fw-bold mb-1" style="font-size: 0.65rem; letter-spacing: 0.05em;">
-                                            <i class="fa-solid fa-notes-medical me-1"></i> Consultation Notes
-                                        </span>
-                                        <p class="text-secondary small mb-0 lh-base">{{ appt.medical_notes }}</p>
-                                    </div>
-                                {% endif %}
-                            </div>
+                            {% endif %}
                         {% endfor %}
                     {% endif %}
                 </div>
