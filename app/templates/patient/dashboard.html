@@ -163,7 +163,8 @@
                                 </div>
                                 {% if appt.status == 'Cancelled' %}
                                     <div class="mt-3">
-                                        <a href="{{ url_for('patient.book') }}" class="btn btn-primary rounded-2 fw-bold py-2 px-3 text-uppercase d-inline-flex align-items-center gap-2" style="font-size: 0.7rem; letter-spacing: 0.05em;">
+                                        <!-- Passing doctor_id and symptoms so they are pre-filled on the booking sheet -->
+                                        <a href="{{ url_for('patient.book', doctor_id=appt.doctor_id, symptoms=appt.symptoms_brief) }}" class="btn btn-primary rounded-2 fw-bold py-2 px-3 text-uppercase d-inline-flex align-items-center gap-2" style="font-size: 0.7rem; letter-spacing: 0.05em;">
                                             <i class="fa-solid fa-arrows-rotate"></i> Reschedule
                                         </a>
                                     </div>

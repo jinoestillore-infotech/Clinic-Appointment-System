@@ -61,9 +61,9 @@ def dashboard():
         """, (session['user_id'],))
         upcoming_appointments = cursor.fetchall()
         
-        # Fetch past consultations (Completed, Cancelled)
+        # Fetch past consultations (Completed, Cancelled) - Fetch doctor_id and symptoms_brief for rescheduling pre-fill!
         cursor.execute("""
-            SELECT a.id, a.appointment_date, a.appointment_time, a.status, a.medical_notes, a.doctor_id,
+            SELECT a.id, a.appointment_date, a.appointment_time, a.status, a.medical_notes, a.doctor_id, a.symptoms_brief,
                    d.first_name AS doc_first, d.last_name AS doc_last, d.specialization,
                    b.amount_due, b.payment_status
             FROM appointments a
@@ -88,10 +88,14 @@ def dashboard():
 def book():
     """
     Displays the appointment booking sheet and handles reservation submission.
-    Includes validation logic to prevent double-booking.
+    Includes validation logic to prevent double-booking. Supports preset options for rescheduling.
     """
     connection = current_app.get_db_connection()
     doctors = []
+    
+    # Capture optional prefill inputs from URL query parameters (for rescheduled appointments)
+    preset_doctor_id = request.args.get('doctor_id', type=int)
+    preset_symptoms = request.args.get('symptoms', '')
     
     try:
         cursor = connection.cursor(dictionary=True)
@@ -114,7 +118,7 @@ def book():
         if not doctor_id or not date_str or not time_str:
             flash('Please complete all required schedule selections.', 'warning')
             connection.close()
-            return render_template('patient/book.html', doctors=doctors)
+            return render_template('patient/book.html', doctors=doctors, preset_doctor_id=preset_doctor_id, preset_symptoms=preset_symptoms)
             
         try:
             cursor = connection.cursor(dictionary=True)
@@ -130,7 +134,7 @@ def book():
                 flash('The selected time slot has already been reserved. Please choose a different hour.', 'warning')
                 cursor.close()
                 connection.close()
-                return render_template('patient/book.html', doctors=doctors)
+                return render_template('patient/book.html', doctors=doctors, preset_doctor_id=preset_doctor_id, preset_symptoms=preset_symptoms)
             
             # Insert the appointment record
             cursor.execute("""
@@ -161,7 +165,7 @@ def book():
     if connection.is_connected():
         connection.close()
         
-    return render_template('patient/book.html', doctors=doctors)
+    return render_template('patient/book.html', doctors=doctors, preset_doctor_id=preset_doctor_id, preset_symptoms=preset_symptoms)
 
 
 @patient_bp.route('/cancel/<int:appointment_id>', methods=['POST'])
