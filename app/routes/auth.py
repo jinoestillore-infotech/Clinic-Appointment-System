@@ -25,10 +25,9 @@ def register():
         
         connection = current_app.get_db_connection()
         try:
-            # Using dictionary=True to return rows as dicts
             cursor = connection.cursor(dictionary=True)
             
-            # Check if username or email already exists to prevent duplicate key errors
+            # Check if username or email already exists
             cursor.execute("SELECT id FROM users WHERE username = %s OR email = %s", (username, email))
             existing_user = cursor.fetchone()
             
@@ -37,10 +36,10 @@ def register():
                 cursor.close()
                 return render_template('auth/register.html')
             
-            # Insert the new patient
+            # Insert the new patient (Active by default)
             sql = """
-                INSERT INTO users (username, email, password_hash, role, first_name, last_name, phone_number)
-                VALUES (%s, %s, %s, 'patient', %s, %s, %s)
+                INSERT INTO users (username, email, password_hash, role, first_name, last_name, phone_number, status)
+                VALUES (%s, %s, %s, 'patient', %s, %s, %s, 'active')
             """
             cursor.execute(sql, (username, email, hashed_password, first_name, last_name, phone))
             cursor.close()
@@ -59,7 +58,8 @@ def register():
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     """
-    Verifies user credentials and establishes a role-based session.
+    Verifies user credentials, checks authorization status (active, suspended, blocked),
+    and establishes a role-based session.
     """
     if request.method == 'POST':
         username = request.form.get('username')
@@ -67,13 +67,20 @@ def login():
         
         connection = current_app.get_db_connection()
         try:
-            # Using dictionary=True so that we can access columns by name (e.g. user['password_hash'])
             cursor = connection.cursor(dictionary=True)
             cursor.execute("SELECT * FROM users WHERE username = %s", (username,))
             user = cursor.fetchone()
             cursor.close()
             
             if user and bcrypt.check_password_hash(user['password_hash'], password):
+                # GOVERNANCE CHECK: Block entry if user status is suspended or blocked
+                if user['status'] == 'suspended':
+                    flash('Your account access has been temporarily suspended. Please contact clinic administration.', 'warning')
+                    return render_template('auth/login.html')
+                elif user['status'] == 'blocked':
+                    flash('Login refused. This account has been permanently blocked.', 'danger')
+                    return render_template('auth/login.html')
+                
                 # Save user metadata in session
                 session['user_id'] = user['id']
                 session['username'] = user['username']
@@ -102,7 +109,7 @@ def login():
 @auth_bp.route('/logout')
 def logout():
     """
-    Clears the system session and redirects to home.
+    Clears the system session and redirects to login.
     """
     session.clear()
     flash('You have been logged out.', 'info')

@@ -78,7 +78,7 @@
                 <ul class="navbar-nav ms-auto align-items-lg-center mt-2 mt-lg-0 gap-2">
                     {% if session.get('user_id') %}
                         <li class="nav-item">
-                            <span class="text-muted small me-2 d-none d-lg-inline-block">Logged in as {{ session.get('first_name', 'Patient') }}</span>
+                            <span class="text-muted small me-2 d-none d-lg-inline-block">Logged in as {{ session.get('username', 'Patient') }}</span>
                         </li>
                         <li class="nav-item">
                             <a class="btn btn-outline-danger btn-sm rounded-2 fw-semibold px-3 text-uppercase tracking-wider" style="font-size: 0.7rem;" href="{{ url_for('auth.logout') }}">

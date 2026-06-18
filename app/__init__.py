@@ -41,9 +41,11 @@ def create_app():
     from app.routes.auth import auth_bp
     from app.routes.patient import patient_bp
     from app.routes.staff import staff_bp
+    from app.routes.owner import owner_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(patient_bp)
     app.register_blueprint(staff_bp)
+    app.register_blueprint(owner_bp)
 
     return app
