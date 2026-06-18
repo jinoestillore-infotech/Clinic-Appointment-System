@@ -71,7 +71,7 @@
                     <span class="text-uppercase text-secondary fw-bold mb-0" style="letter-spacing: 0.08em;">Upcoming Schedules</span>
                     <span class="badge bg-dark-subtle text-dark rounded-pill px-3 py-1.5 fw-semibold small">{{ upcoming|length }} Active</span>
                 </div>
-                <div class="card-body p-0">
+                <div class="card-body p-0 bg-light">
                     {% if not upcoming %}
                         <div class="text-center py-5 px-3">
                             <div class="text-muted mb-3">
@@ -81,7 +81,7 @@
                         </div>
                     {% else %}
                         {% for appt in upcoming %}
-                            <div class="p-4 border-bottom border-light-subtle position-relative card-hover">
+                            <div class="p-4 rounded-3 border border-danger-subtle position-relative card-hover mb-2 m-2 m-sm-4">
                                 <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start gap-3">
                                     <div class="border-start border-4 border-primary ps-3">
                                         <span class="text-uppercase text-primary fw-bold d-inline-flex align-items-center gap-1 mb-1 small" style="font-size: 0.75rem; letter-spacing: 0.05em;">

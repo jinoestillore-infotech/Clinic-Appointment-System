@@ -215,15 +215,27 @@
         const completeTriggers = document.querySelectorAll('.btn-complete-trigger');
         const modalForm = document.getElementById('modalCompleteForm');
         const modalPatientText = document.getElementById('modalPatientName');
-        const completionModal = new bootstrap.Modal(document.getElementById('completeConsultationModal'));
 
         completeTriggers.forEach(function (button) {
             button.addEventListener('click', function () {
                 const targetActionUrl = this.getAttribute('data-action-url');
                 const patientName = this.getAttribute('data-patient-name');
+                
                 modalForm.setAttribute('action', targetActionUrl);
                 modalPatientText.innerText = patientName;
-                completionModal.show();
+
+                // Safe dynamic initialization check to prevent "ReferenceError: bootstrap is not defined" 
+                // in case the script block executes before the external Bootstrap JS bundle is fully ready.
+                if (typeof bootstrap !== 'undefined') {
+                    const modalEl = document.getElementById('completeConsultationModal');
+                    let completionModal = bootstrap.Modal.getInstance(modalEl);
+                    if (!completionModal) {
+                        completionModal = new bootstrap.Modal(modalEl);
+                    }
+                    completionModal.show();
+                } else {
+                    console.error('Bootstrap JS bundle is not loaded yet.');
+                }
             });
         });
     });
